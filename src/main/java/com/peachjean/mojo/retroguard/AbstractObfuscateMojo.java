@@ -44,11 +44,13 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo {
 			}
 		}
 
-		getLog().info("Invoking RetroGuard with args:");
-		getLog().info("  " + inJar);
-		getLog().info("  " + outJar);
-		getLog().info("  " + config);
-		getLog().info("  " + log);
+		getLog().info("Obfuscating " + inJar);
+
+		getLog().debug("Invoking RetroGuard with args:");
+		getLog().debug("  " + inJar);
+		getLog().debug("  " + outJar);
+		getLog().debug("  " + config);
+		getLog().debug("  " + log);
 
 		RetroGuardTask retroGuardTask = new RetroGuardTask();
 		retroGuardTask.setInfile(inJar.getAbsolutePath());

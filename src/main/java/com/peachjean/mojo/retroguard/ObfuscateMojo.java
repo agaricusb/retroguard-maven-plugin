@@ -113,18 +113,17 @@ public class ObfuscateMojo
 
 	@Override
 	protected File getObfuscationLog() {
-		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + ".retroguard.spec");
+		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + ".rgs");
 	}
 
 	@Override
 	protected File getOutJar() {
-		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + project.getPackaging());
+		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + ".jar");
 	}
 
 	@Override
 	protected File getInJar() {
-		return new File(project.getBuild().getDirectory(), finalName + useClassifier(sourceClassifier, "-") + "."
-		                                                         + project.getPackaging());
+		return project.getArtifact().getFile();
 	}
 
 }
