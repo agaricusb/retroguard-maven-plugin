@@ -9,29 +9,14 @@ import org.apache.maven.project.MavenProjectHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jbunting
- * Date: 4/4/11
- * Time: 9:06 PM
- * To change this template use File | Settings | File Templates.
+ * Goal which echoes a string.
+ *
+ * @goal obfuscate
+ * @phase package
+ * @requiresProject
+ * @requiresDependencyResolution runtime
  */
 public class ObfuscateMojo extends AbstractMojo {
-
-
-    private File inJar;
-    private File outJar;
-    private File obfuscationLog;
-    private File config;
-
-    /**
-     * Should the obfuscated jar be deployed with the build?
-     *
-     * @parameter expression="${obfuscate.attach}" default-value="false"
-     *
-     * @since 2.2
-     */
-
-    private boolean attach;
 
     /**
      * @component
@@ -39,10 +24,29 @@ public class ObfuscateMojo extends AbstractMojo {
     private MavenProjectHelper projectHelper;
 
     /**
-     * @component
+     * Name of the generated JAR.
+     *
+     * @parameter alias="jarName" expression="${jar.finalName}" default-value="${project.build.finalName}"
+     * @required
+     */
+    private String finalName;
+
+    /**
+     * The Maven project.
+     *
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
      */
     private MavenProject project;
 
+    /**
+     * Directory containing the generated JAR.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
     /**
      * Classifier to add to the artifact generated. If given, the artifact will be an attachment instead.
@@ -51,14 +55,41 @@ public class ObfuscateMojo extends AbstractMojo {
      */
     private String classifier;
 
+    public ObfuscateMojo() {
+    }
+
+    public ObfuscateMojo(MavenProjectHelper projectHelper, String finalName, MavenProject project, File outputDirectory, String classifier) {
+        this.projectHelper = projectHelper;
+        this.finalName = finalName;
+        this.project = project;
+        this.outputDirectory = outputDirectory;
+        this.classifier = classifier;
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Obfuscator obfuscator = new MavenObfuscator(inJar, outJar, obfuscationLog, config, getLog(), project);
+        File jarFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, "jar");
+        File obfuscatedJarFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, Utils.OBFUSCATED_EXTENSION);
+        File obfuscationLogFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, Utils.SPEC_EXTENSION);
+
+        // for each obfuscated dependency we need to get the spec file.  Then we need to check dates.  We will regenerate our spec file if ANY source files have changed
+        File specFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, Utils.GEN_SPEC_EXTENSION);
+
+        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, specFile, getLog(), project);
+
         obfuscator.obfuscate();
 
-        if(attach)
+
+        if ( classifier != null )
         {
-            this.projectHelper.attachArtifact(project, "jar", classifier, outJar);
+            projectHelper.attachArtifact( project, Utils.OBFUSCATED_TYPE, classifier, obfuscatedJarFile );
         }
+        else
+        {
+            project.getArtifact().setFile( obfuscatedJarFile );
+        }
+
+        projectHelper.attachArtifact( project, Utils.SPEC_TYPE, classifier, obfuscationLogFile);
+
     }
 }
