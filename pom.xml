@@ -11,6 +11,7 @@
         <module>retroguard-maven-plugin</module>
         <module>retroguard-compiler-maven-plugin</module>
         <module>retroguard-jar-maven-plugin</module>
+        <module>retroguard-surefire-maven-plugin</module>
     </modules>
     <pluginRepositories>
         <pluginRepository>
