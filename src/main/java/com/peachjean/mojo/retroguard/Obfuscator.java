@@ -39,6 +39,12 @@ public abstract class Obfuscator {
             }
         }
 
+        if (inJar.lastModified() < outJar.lastModified())
+        {
+            logInfo("Previously obfuscated jar still current, not running obfuscation...");
+            return;
+        }
+
         logInfo("Obfuscating " + inJar);
 
         logDebug("Invoking RetroGuard with args:");
