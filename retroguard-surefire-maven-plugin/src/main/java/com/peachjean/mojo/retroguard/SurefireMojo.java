@@ -16,6 +16,6 @@ import java.util.List;
 public class SurefireMojo extends SurefirePlugin {
     @Override
     public List generateTestClasspath() throws DependencyResolutionRequiredException, MojoExecutionException {
-        return Utils.replaceWithUnobfuscated(super.generateTestClasspath(), getPluginContext());
+        return Utils.replaceWithUnobfuscated(super.generateTestClasspath(), this.getSession());
     }
 }

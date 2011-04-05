@@ -2,7 +2,9 @@ package com.peachjean.mojo.retroguard;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -40,7 +42,8 @@ public class Utils {
 
     }
 
-    public static List<String> replaceWithUnobfuscated(List<String> classpathElements, Map pluginContext) {
+    public static List<String> replaceWithUnobfuscated(List<String> classpathElements, MavenSession session) {
+        Map<String, Object> pluginContext = getRetroguardContext(session);
         final Map<String, File> unobfuscated =
                 (Map<String, File>) pluginContext.get(CONTEXT_UNOBFUSCATED_MAP);
         return Lists.transform(classpathElements, new Function<String, String>() {
@@ -49,6 +52,15 @@ public class Utils {
                 return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
             }
         });
+    }
+
+    public static Map<String, Object> getRetroguardContext(MavenSession session)
+    {
+        PluginDescriptor desc = new PluginDescriptor();
+        desc.setGroupId( "com.peachjean.mojo" );
+        desc.setArtifactId( "retroguard-maven-plugin" );
+
+        return session.getPluginContext( desc, session.getCurrentProject());
     }
 
     protected static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
