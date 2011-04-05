@@ -12,9 +12,9 @@
                   <initialize>com.peachjean.mojo:retroguard-maven-plugin:init</initialize>
                   <generate-resources>com.peachjean.mojo:retroguard-maven-plugin:generateSpec</generate-resources>
                   <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-                  <compile>com.peachjean.mojo:retroguard-maven-plugin:compile</compile>
+                  <compile>com.peachjean.mojo:retroguard-compiler-maven-plugin:compile</compile>
                   <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-                  <test-compile>com.peachjean.mojo:retroguard-maven-plugin:testCompile</test-compile>
+                  <test-compile>com.peachjean.mojo:retroguard-compiler-maven-plugin:testCompile</test-compile>
                   <test>com.peachjean.mojo:retroguard-maven-plugin:test</test>
                   <package>com.peachjean.mojo:retroguard-maven-plugin:jar,com.peachjean.mojo:retroguard-maven-plugin:obfuscate</package>
                   <install>org.apache.maven.plugins:maven-install-plugin:install</install>

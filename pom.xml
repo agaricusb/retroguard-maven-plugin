@@ -9,6 +9,7 @@
 	<url>http://mojo.peachjean.com/retroguard</url>
     <modules>
         <module>retroguard-maven-plugin</module>
+        <module>retroguard-compiler-maven-plugin</module>
     </modules>
     <pluginRepositories>
         <pluginRepository>
