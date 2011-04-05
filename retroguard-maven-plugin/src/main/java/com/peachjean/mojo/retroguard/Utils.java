@@ -2,12 +2,10 @@ package com.peachjean.mojo.retroguard;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.apache.maven.plugin.AbstractCompilerMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 

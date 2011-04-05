@@ -16,7 +16,7 @@
                   <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
                   <test-compile>com.peachjean.mojo:retroguard-compiler-maven-plugin:testCompile</test-compile>
                   <test>com.peachjean.mojo:retroguard-maven-plugin:test</test>
-                  <package>com.peachjean.mojo:retroguard-maven-plugin:jar,com.peachjean.mojo:retroguard-maven-plugin:obfuscate</package>
+                  <package>com.peachjean.mojo:retroguard-jar-maven-plugin:jar,com.peachjean.mojo:retroguard-maven-plugin:obfuscate</package>
                   <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                   <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
                 </phases>
