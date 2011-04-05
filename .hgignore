@@ -1,4 +1,6 @@
 syntax: glob
 .idea
 *.iml
+*.iws
+*.ipr
 target

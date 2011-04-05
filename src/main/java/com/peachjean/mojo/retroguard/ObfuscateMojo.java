@@ -1,129 +1,64 @@
 package com.peachjean.mojo.retroguard;
 
-/*
- * Copyright 2001-2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
 import java.io.File;
 
-
 /**
- * Goal which echoes a string.
- *
- * @goal obfuscate
- * @requiresProject true
- * @phase package
+ * Created by IntelliJ IDEA.
+ * User: jbunting
+ * Date: 4/4/11
+ * Time: 9:06 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class ObfuscateMojo
-		extends AbstractObfuscateMojo {
+public class ObfuscateMojo extends AbstractMojo {
 
-	/**
-	 * Used for attaching the source jar to the project.
-	 *
-	 * @component
-	 */
-	private MavenProjectHelper projectHelper;
 
-	/**
-	 * @parameter expression="${project}"
-	 * @readonly
-	 * @required
-	 */
-	protected MavenProject project;
+    private File inJar;
+    private File outJar;
+    private File obfuscationLog;
+    private File config;
 
-	/**
-	 * Specifies whether or not to attach the map artifact to the project
-	 *
-	 * @parameter expression="${retroguard.attachMap}" default-value="true"
-	 */
-	private boolean attachMap;
+    /**
+     * Should the obfuscated jar be deployed with the build?
+     *
+     * @parameter expression="${obfuscate.attach}" default-value="false"
+     *
+     * @since 2.2
+     */
 
-	/**
-	 * Specifies whether or not to attach the obfuscated jar to the project
-	 *
-	 * @parameter expression="${retroguard.attachObfuscatedJar}" default-value="true"
-	 */
-	private boolean attachObfuscatedJar;
+    private boolean attach;
 
-	/**
-	 * The classifier to use for the obfuscated jar.  Defaults to "obfuscated".
-	 *
-	 * @parameter expression="${retroguard.classifier}" default-value="obfuscated"
-	 */
-	private String classifier;
+    /**
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
 
-	/**
-	 * The classifier of the source jar.
-	 *
-	 * @parameter expression="${retroguard.sourceClassifier}" default-value=""
-	 * @required false
-	 */
-	private String sourceClassifier;
+    /**
+     * @component
+     */
+    private MavenProject project;
 
-	/**
-	 * The directory where the generated archive file will be put. Defaults to ${project.build.directory} specified
-	 * in the
-	 * pom or inherited from the super pom.
-	 *
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	protected File outputDirectory;
 
-	/**
-	 * The filename to be used for the generated archive file. For the source:jar goal, "-sources" is appended to this
-	 * filename. For the source:test-jar goal, "-test-sources" is appended. Defaults to ${project.build.finalName}
-	 * specified in the pom or inherited from the super pom.
-	 *
-	 * @parameter expression="${project.build.finalName}"
-	 * @required
-	 */
-	protected String finalName;
+    /**
+     * Classifier to add to the artifact generated. If given, the artifact will be an attachment instead.
+     *
+     * @parameter
+     */
+    private String classifier;
 
-	private String useClassifier(String classifier, String prefix) {
-		return StringUtils.isBlank(classifier) ? "" : prefix + classifier;
-	}
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        Obfuscator obfuscator = new MavenObfuscator(inJar, outJar, obfuscationLog, config, getLog(), project);
+        obfuscator.obfuscate();
 
-	@Override
-	protected void processArtifact(final File outJar, final File log) {
-
-		if (attachMap) {
-			projectHelper.attachArtifact(project, "retroguard.spec", "", log);
-		}
-		if (attachObfuscatedJar) {
-			projectHelper.attachArtifact(project, project.getPackaging(), "obfuscated", outJar);
-		}
-	}
-
-	@Override
-	protected File getObfuscationLog() {
-		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + ".rgs");
-	}
-
-	@Override
-	protected File getOutJar() {
-		return new File(outputDirectory, finalName + useClassifier(classifier, "-") + ".jar");
-	}
-
-	@Override
-	protected File getInJar() {
-		return project.getArtifact().getFile();
-	}
-
+        if(attach)
+        {
+            this.projectHelper.attachArtifact(project, "jar", classifier, outJar);
+        }
+    }
 }
