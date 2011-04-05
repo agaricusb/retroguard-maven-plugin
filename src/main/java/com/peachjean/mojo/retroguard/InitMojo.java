@@ -128,11 +128,7 @@ public class InitMojo extends AbstractMojo {
                 }
                 dependencySpecs.add(artifact.getFile());
 
-                try {
-                    unobfuscatedMapping.put(obfArtifact.getFile().toURI().toURL().toString(), unobfArtifact.getFile());
-                } catch (MalformedURLException e) {
-                    throw new MojoExecutionException("Could not calculate URL for unobfuscated " + dependency.toString(), e);
-                }
+                unobfuscatedMapping.put(obfArtifact.getFile().getPath(), unobfArtifact.getFile());
             }
         }
     }

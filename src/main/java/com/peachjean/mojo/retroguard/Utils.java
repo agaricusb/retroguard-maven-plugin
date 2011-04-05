@@ -48,11 +48,7 @@ public class Utils {
         return Lists.transform(classpathElements, new Function<String, String>() {
             @Override
             public String apply(String input) {
-                try {
-                    return unobfuscated.containsKey(input) ? unobfuscated.get(input).toURI().toURL().toString() : input;
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException("Failed to lookup unobfuscated dependency...", e);
-                }
+                return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
             }
         });
     }
