@@ -2,7 +2,7 @@
     <components>
         <component>
           <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-          <role-hint>obfuscated</role-hint>
+          <role-hint>obfuscated.jar</role-hint>
           <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
           <configuration>
             <lifecycles>
@@ -26,7 +26,7 @@
         </component>
         <component>
           <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-          <role-hint>obfuscated</role-hint>
+          <role-hint>obfuscated.jar</role-hint>
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
             <type>obfuscated</type>
@@ -37,7 +37,7 @@
         </component>
         <component>
           <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-          <role-hint>unobfuscated</role-hint>
+          <role-hint>unobfuscated.jar</role-hint>
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
             <type>unobfuscated</type>
