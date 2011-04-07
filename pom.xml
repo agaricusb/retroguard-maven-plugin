@@ -8,8 +8,8 @@
 	<name>Retroguard Maven Plugin</name>
 	<url>http://mojo.peachjean.com/retroguard</url>
     <scm>
-        <connection>https://bitbucket.org/jaredbunting/retroguard-maven-plugin</connection>
-        <developerConnection>ssh://hg@hg.peachjean.com/jaredbunting/retroguard-maven-plugin</developerConnection>
+        <connection>scm:hg:https://bitbucket.org/jaredbunting/retroguard-maven-plugin</connection>
+        <developerConnection>scm:hg:ssh://hg@hg.peachjean.com/jaredbunting/retroguard-maven-plugin</developerConnection>
         <url>https://bitbucket.org/jaredbunting/retroguard-maven-plugin</url>
     </scm>
     <modules>
