@@ -2,20 +2,23 @@ package com.peachjean.mojo.retroguard;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 public class Utils {
 
-    public static final String OBFUSCATED_TYPE = "obfuscated";
+    public static final String OBFUSCATED_TYPE = "obfuscated.jar";
     public static final String SPEC_TYPE = "retroguard-spec";
-    public static final String UNOBFUSCATED_TYPE = "unobfuscated";
+    public static final String UNOBFUSCATED_TYPE = "unobfuscated.jar";
     public static final String OBFUSCATED_EXTENSION = "obfuscated.jar";
     public static final String SPEC_EXTENSION = "rgs";
     public static final String GEN_SPEC_EXTENSION = "gen-spec";
@@ -52,6 +55,10 @@ public class Utils {
                 return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
             }
         });
+    }
+
+    public static URL getUnobfuscatedUrl(Artifact obfuscatedArtifact, MavenSession session) throws MalformedURLException {
+        return ((Map<String, File>)getRetroguardContext(session).get(CONTEXT_UNOBFUSCATED_MAP)).get(obfuscatedArtifact.getFile().getPath()).toURI().toURL();
     }
 
     public static Map<String, Object> getRetroguardContext(MavenSession session)

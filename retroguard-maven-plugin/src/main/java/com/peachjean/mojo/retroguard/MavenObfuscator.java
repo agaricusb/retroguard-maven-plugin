@@ -2,6 +2,7 @@ package com.peachjean.mojo.retroguard;
 
 import COM.rl.ant.RetroGuardTask;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -16,22 +17,31 @@ public class MavenObfuscator extends Obfuscator {
 
     private Log log;
     private MavenProject project;
+    private MavenSession session;
     private Class retroGuardTaskClass;
 
-    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, Log log, MavenProject project) {
-        super(inJar, outJar, obfuscateLog, config);
+    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, MavenSession session) throws ObfuscationException {
+        super(inJar, outJar, obfuscateLog, config, workDir);
         this.log = log;
         this.project = project;
+        this.session = session;
     }
 
     @Override
-    public Object setup() {
+    public Object setup() throws ObfuscationException {
         try {
             ClassRealm pluginRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
-            ClassRealm childRealm = pluginRealm.createChildRealm("retroguard-task");
+            ClassRealm childRealm = pluginRealm.createChildRealm(project.getId() + "-retroguard-task");
             for(Artifact artifact: (List<Artifact>) project.getCompileArtifacts())
             {
-                childRealm.addURL(artifact.getFile().toURI().toURL());
+                if(Utils.OBFUSCATED_TYPE.equals(artifact.getType()))
+                {
+                    childRealm.addURL(Utils.getUnobfuscatedUrl(artifact, session));
+                }
+                else
+                {
+                    childRealm.addURL(artifact.getFile().toURI().toURL());
+                }
             }
             for(URL constituent: pluginRealm.getURLs())
             {
@@ -41,7 +51,7 @@ public class MavenObfuscator extends Obfuscator {
             retroGuardTaskClass = childRealm.loadClass(RetroGuardTask.class.getName());
             return retroGuardTaskClass.newInstance();
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new ObfuscationException("Could not setup retroguard classloader...", e);
         }
     }
 
