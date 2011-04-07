@@ -1,19 +1,25 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.compiler;
 
+import com.peachjean.mojo.retroguard.Utils;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractCompilerMojo;
+import org.apache.maven.plugin.CompilationFailureException;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.util.List;
 
 /**
- * Compiles test sources
+ * Compiles application sources
  *
  * @extendsPlugin compiler
- * @goal testCompile
- * @phase test-compile
+ * @goal compile
+ * @phase compile
  * @threadSafe
- * @requiresDependencyResolution test
+ * @requiresDependencyResolution compile
  */
-public class TestCompilerMojo extends org.apache.maven.plugin.TestCompilerMojo {
+public class CompilerMojo extends org.apache.maven.plugin.CompilerMojo {
+
+
     /**
      * The current build session instance. This is used for
      * toolchain manager API calls.

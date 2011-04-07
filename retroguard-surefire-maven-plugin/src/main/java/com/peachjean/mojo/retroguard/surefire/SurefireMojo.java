@@ -1,5 +1,6 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.surefire;
 
+import com.peachjean.mojo.retroguard.Utils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.surefire.SurefirePlugin;

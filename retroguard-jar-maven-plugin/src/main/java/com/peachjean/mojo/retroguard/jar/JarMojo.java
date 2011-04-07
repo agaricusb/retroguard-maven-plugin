@@ -1,5 +1,6 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.jar;
 
+import com.peachjean.mojo.retroguard.Utils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.jar.AbstractJarMojo;
 import org.apache.maven.project.MavenProject;
