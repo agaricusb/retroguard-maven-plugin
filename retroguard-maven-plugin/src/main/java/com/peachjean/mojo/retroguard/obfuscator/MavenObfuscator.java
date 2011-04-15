@@ -1,6 +1,8 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.obfuscator;
 
 import COM.rl.ant.RetroGuardTask;
+import com.peachjean.mojo.retroguard.ObfuscationException;
+import com.peachjean.mojo.retroguard.Utils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
@@ -9,7 +11,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -20,7 +21,8 @@ public class MavenObfuscator extends Obfuscator {
     private MavenSession session;
     private Class retroGuardTaskClass;
 
-    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, MavenSession session) throws ObfuscationException {
+    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, MavenSession session) throws ObfuscationException
+    {
         super(inJar, outJar, obfuscateLog, config, workDir);
         this.log = log;
         this.project = project;

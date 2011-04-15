@@ -1,11 +1,16 @@
 package com.peachjean.mojo.retroguard;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -25,52 +30,86 @@ public class Utils {
     public static final String CONTEXT_SPEC_LIST = "specList";
     public static final String CONTEXT_UNOBFUSCATED_MAP = "unobfuscated";
 
-    public static void propagatePrivateFields(Object obj, Class<?> targetClass, String ... fieldNames) throws MojoExecutionException
+	public static void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<String> values)
+	{
+		augmentConfigurationList(configuration, name, values, Functions.<String>identity());
+	}
+
+	public static <T> void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<? extends T> values, Function<T, String> converter)
+	{
+		augmentConfigurationList(configuration, name, values, Predicates.<T>alwaysTrue(), converter);
+	}
+
+    public static <T> void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<? extends T> values, Predicate<T> filter, Function<T, String> converter)
     {
-        for(String fieldName: fieldNames)
+        Xpp3Dom configList = configuration.getChild(name);
+        if(configList == null)
         {
-            try {
-                Field target = targetClass.getDeclaredField(fieldName);
-                target.setAccessible(true);
-                Field source = obj.getClass().getDeclaredField(fieldName);
-                source.setAccessible(true);
-
-                target.set(obj, source.get(obj));
-            } catch (NoSuchFieldException e) {
-                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
-            } catch (IllegalAccessException e) {
-                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
-            }
+            configList = new Xpp3Dom(name);
+            configuration.addChild(configList);
         }
-
+        for(T value: values)
+        {
+	        if(filter.apply(value))
+	        {
+		        Xpp3Dom configValue = new Xpp3Dom("value");
+		        configValue.setValue(converter.apply(value));
+		        configList.addChild(configValue);
+			}
+        }
     }
 
-    public static List<String> replaceWithUnobfuscated(List<String> classpathElements, MavenSession session) {
-        Map<String, Object> pluginContext = getRetroguardContext(session);
-        final Map<String, File> unobfuscated =
-                (Map<String, File>) pluginContext.get(CONTEXT_UNOBFUSCATED_MAP);
-        return Lists.transform(classpathElements, new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
-            }
-        });
-    }
+//    public static void propagatePrivateFields(Object obj, Class<?> targetClass, String ... fieldNames) throws MojoExecutionException
+//    {
+//        for(String fieldName: fieldNames)
+//        {
+//            try {
+//                Field target = targetClass.getDeclaredField(fieldName);
+//                target.setAccessible(true);
+//                Field source = obj.getClass().getDeclaredField(fieldName);
+//                source.setAccessible(true);
+//
+//                target.set(obj, source.get(obj));
+//            } catch (NoSuchFieldException e) {
+//                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
+//            } catch (IllegalAccessException e) {
+//                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
+//            }
+//        }
+//
+//    }
+//
+//    public static List<String> replaceWithUnobfuscated(List<String> classpathElements, MavenSession session) {
+//        Map<String, Object> pluginContext = getRetroguardContext(session);
+//        final Map<String, File> unobfuscated =
+//                (Map<String, File>) pluginContext.get(CONTEXT_UNOBFUSCATED_MAP);
+//        return Lists.transform(classpathElements, new Function<String, String>() {
+//            @Override
+//            public String apply(String input) {
+//                return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
+//            }
+//        });
+//    }
 
     public static URL getUnobfuscatedUrl(Artifact obfuscatedArtifact, MavenSession session) throws MalformedURLException {
         return ((Map<String, File>)getRetroguardContext(session).get(CONTEXT_UNOBFUSCATED_MAP)).get(obfuscatedArtifact.getFile().getPath()).toURI().toURL();
     }
 
-    public static Map<String, Object> getRetroguardContext(MavenSession session)
+    private static Map<String, Object> getRetroguardContext(MavenSession session)
     {
         PluginDescriptor desc = new PluginDescriptor();
         desc.setGroupId( "com.peachjean.mojo" );
-        desc.setArtifactId( "retroguard-maven-plugin" );
+        desc.setArtifactId("retroguard-maven-plugin");
 
         return session.getPluginContext( desc, session.getCurrentProject());
     }
 
-    protected static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
+    public static ObfuscationConfiguration getObfuscationConfiguration(MavenSession session)
+    {
+	    return (ObfuscationConfiguration) getRetroguardContext(session).get("obfuscation.Configuration");
+    }
+
+    public static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
     {
         if ( classifier == null )
         {
@@ -83,4 +122,9 @@ public class Utils {
 
         return new File( basedir, finalName + classifier + "." + extension );
     }
+
+	public static void setObfuscationConfiguration(MavenSession session, ObfuscationConfiguration configuration)
+	{
+		getRetroguardContext(session).put("obfuscation.Configuration", configuration);
+	}
 }

@@ -1,6 +1,27 @@
 <component-set>
     <components>
         <component>
+            <role>com.peachjean.mojo.retroguard.RevealingExecutionListener</role>
+            <role-hint>default</role-hint>
+            <implementation>com.peachjean.mojo.retroguard.RevealingExecutionListener</implementation>
+            <isolated-realm>false</isolated-realm>
+            <requirements>
+                <requirement>
+                    <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+                </requirement>
+            </requirements>
+        </component>
+        <component>
+            <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
+            <role-hint>obfuscated</role-hint>
+            <implementation>com.peachjean.mojo.retroguard.ObfuscatingMavenLifecycleParticipant</implementation>
+            <requirements>
+              <requirement>
+                <role>com.peachjean.mojo.retroguard.RevealingExecutionListener</role>
+              </requirement>
+            </requirements>
+        </component>
+        <component>
           <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
           <role-hint>obfuscated.jar</role-hint>
           <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
@@ -29,7 +50,7 @@
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
             <type>obfuscated</type>
-            <extension>obfuscated.jar</extension>
+            <extension>jar</extension>
             <language>java</language>
             <addedToClasspath>true</addedToClasspath>
           </configuration>
@@ -40,9 +61,10 @@
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
             <type>unobfuscated</type>
-            <extension>unobfuscated.jar</extension>
+            <extension>jar</extension>
             <language>java</language>
             <addedToClasspath>true</addedToClasspath>
+            <classifier>unobfuscated</classifier>
           </configuration>
         </component>
         <component>

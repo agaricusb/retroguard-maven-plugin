@@ -1,9 +1,10 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.obfuscator;
 
 import COM.rl.ant.RGpatchTask;
 import COM.rl.ant.RetroGuardTask;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import com.peachjean.mojo.retroguard.ObfuscationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.BuildException;
@@ -30,7 +31,8 @@ public abstract class Obfuscator {
     private Collection<File> dependentJars = new HashSet<File>();
     private Collection<File> dependentSpecs = new HashSet<File>();
 
-    protected Obfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir) throws ObfuscationException {
+    protected Obfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir) throws ObfuscationException
+    {
         this.inJar = inJar;
         this.outJar = outJar;
         this.obfuscateLog = obfuscateLog;

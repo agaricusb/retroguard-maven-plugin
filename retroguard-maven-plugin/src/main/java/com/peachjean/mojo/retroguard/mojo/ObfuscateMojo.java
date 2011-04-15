@@ -1,5 +1,8 @@
-package com.peachjean.mojo.retroguard;
+package com.peachjean.mojo.retroguard.mojo;
 
+import com.peachjean.mojo.retroguard.ObfuscationException;
+import com.peachjean.mojo.retroguard.Utils;
+import com.peachjean.mojo.retroguard.obfuscator.MavenObfuscator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -104,7 +107,7 @@ public class ObfuscateMojo extends AbstractMojo {
 
         if ( classifier != null )
         {
-            projectHelper.attachArtifact( project, Utils.OBFUSCATED_TYPE, classifier, obfuscatedJarFile );
+            projectHelper.attachArtifact( project, "jar", classifier, obfuscatedJarFile );
         }
         else
         {
