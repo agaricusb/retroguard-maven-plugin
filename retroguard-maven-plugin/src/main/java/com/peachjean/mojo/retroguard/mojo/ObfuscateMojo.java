@@ -1,6 +1,6 @@
 package com.peachjean.mojo.retroguard.mojo;
 
-import com.peachjean.mojo.retroguard.ObfuscationException;
+import com.peachjean.mojo.retroguard.obfuscator.ObfuscationException;
 import com.peachjean.mojo.retroguard.Utils;
 import com.peachjean.mojo.retroguard.obfuscator.MavenObfuscator;
 import org.apache.maven.execution.MavenSession;

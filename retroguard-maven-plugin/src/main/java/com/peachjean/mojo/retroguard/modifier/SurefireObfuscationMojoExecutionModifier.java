@@ -25,32 +25,34 @@ public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojo
 		}
 	};
 
-	List<String> applicablePlugins = Arrays.asList(new String[]{
+	String[] applicablePlugins = new String[]{
             "org.apache.maven.plugins:maven-surefire-plugin",
             "org.apache.maven.plugins:maven-failsafe-plugin"
-    });
+    };
 
-    @Override
+	@Override
+	public String[] listApplicablePluginKeys()
+	{
+		return applicablePlugins;
+	}
+
+	@Override
     public void modifyExecution(MavenSession session, MojoExecution mojoExecution, ObfuscationConfiguration configuration) {
-        if(applicablePlugins.contains(mojoExecution.getPlugin().getKey()))
-        {
-            Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathDependencyExcludes", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER,    new Function<Artifact, String>()
-            {
-	            @Override
-	            public String apply(Artifact input)
-	            {
-		            return input.getId();
-	            }
-            });
+		Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathDependencyExcludes", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER,    new Function<Artifact, String>()
+		{
+			@Override
+			public String apply(Artifact input)
+			{
+				return input.getId();
+			}
+		});
 
-	        final Map<String, String> idMapping = configuration.getUnobfuscatedIdMapping();
-            Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "additionalClasspathElements", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER, new Function<Artifact, String>() {
-                @Override
-                public String apply(Artifact input) {
-                    return idMapping.get(input.getId());
-                }
-            });
-        }
-        // do nothing
+		final Map<String, String> idMapping = configuration.getUnobfuscatedIdMapping();
+		Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "additionalClasspathElements", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER, new Function<Artifact, String>() {
+			@Override
+			public String apply(Artifact input) {
+				return idMapping.get(input.getId());
+			}
+		});
     }
 }

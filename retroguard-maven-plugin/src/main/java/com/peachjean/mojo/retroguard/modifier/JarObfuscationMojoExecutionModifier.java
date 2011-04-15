@@ -10,10 +10,15 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class JarObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
 {
 
-    @Override
+	@Override
+	public String[] listApplicablePluginKeys()
+	{
+		return new String[] { "org.apache.maven.plugins:maven-jar-plugin" };
+	}
+
+	@Override
     public void modifyExecution(MavenSession session, MojoExecution mojoExecution, ObfuscationConfiguration configuration) {
-        if("org.apache.maven.plugins:maven-jar-plugin".equals(mojoExecution.getPlugin().getKey())
-                && mojoExecution.getConfiguration().getChild("classifier") == null)
+        if(mojoExecution.getConfiguration().getChild("classifier") == null)
         {
             Xpp3Dom classifier = new Xpp3Dom("classifier");
             classifier.setValue(Utils.UNOBFUSCATED_TYPE);

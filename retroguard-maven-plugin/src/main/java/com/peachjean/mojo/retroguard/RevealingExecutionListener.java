@@ -1,5 +1,6 @@
 package com.peachjean.mojo.retroguard;
 
+import com.google.common.base.Strings;
 import com.peachjean.mojo.retroguard.ObfuscationConfiguration;
 import com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier;
 import com.peachjean.mojo.retroguard.Utils;
@@ -13,6 +14,7 @@ import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,12 +49,15 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
                 try {
                     mojoExecutor.execute(session, Collections.singletonList(execution), new ProjectIndex(session.getProjects()));
                 } catch (LifecycleExecutionException e) {
-                    throw new ObfuscationException("Attempting to create obfuscation configuration...");
+                    throw new ObfuscationConfigurationException("Attempting to create obfuscation configuration...");
                 }
             }
 			for(ObfuscationMojoExecutionModifier mojoExecutionModifier : modifiers)
 			{
-				mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);
+				if(Arrays.binarySearch(mojoExecutionModifier.listApplicablePluginKeys(), mojoExecution.getPlugin().getKey()) > 0)
+				{
+					mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);
+				}
 			}
         }
         delegate.mojoStarted(event);

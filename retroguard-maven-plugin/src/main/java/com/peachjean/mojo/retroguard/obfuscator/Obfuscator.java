@@ -4,9 +4,7 @@ import COM.rl.ant.RGpatchTask;
 import COM.rl.ant.RetroGuardTask;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import com.peachjean.mojo.retroguard.ObfuscationException;
 import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.BuildException;
 
 import java.io.*;

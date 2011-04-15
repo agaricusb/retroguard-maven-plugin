@@ -18,48 +18,49 @@ import java.util.Map;
 
 public class CompilerObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
 {
-    @Override
+	@Override
+	public String[] listApplicablePluginKeys()
+	{
+		return new String[] { "org.apache.maven.plugins:maven-compiler-plugin" };
+	}
+
+	@Override
     public void modifyExecution(MavenSession session, MojoExecution mojoExecution, final ObfuscationConfiguration configuration) {
-        if("org.apache.maven.plugins:maven-compiler-plugin".equals(mojoExecution.getPlugin().getKey()))
-        {
-            List<String> classpathElements;
-            try {
-                if(mojoExecution.getConfiguration().getChild("classpathElements") != null)
-                {
-                    Xpp3Dom classpathElementConfig = mojoExecution.getConfiguration().getChild("classpathElements");
-                    Xpp3Dom[] children = classpathElementConfig.getChildren();
-                    classpathElements = new ArrayList<String>(children.length);
-                    for(Xpp3Dom child: children)
-                    {
-                        classpathElements.add(child.getValue());
-                    }
+		List<String> classpathElements;
+		try {
+			if(mojoExecution.getConfiguration().getChild("classpathElements") != null)
+			{
+				Xpp3Dom classpathElementConfig = mojoExecution.getConfiguration().getChild("classpathElements");
+				Xpp3Dom[] children = classpathElementConfig.getChildren();
+				classpathElements = new ArrayList<String>(children.length);
+				for(Xpp3Dom child: children)
+				{
+					classpathElements.add(child.getValue());
+				}
 
-                }
-                else if("compile".equals(mojoExecution.getGoal()))
-                {
-                    classpathElements = session.getCurrentProject().getCompileClasspathElements();
-                }
-                else if("testCompile".equals(mojoExecution.getGoal()))
-                {
-                    classpathElements = session.getCurrentProject().getTestClasspathElements();
-                }
-                else
-                {
-                    return;
-                }
-	            final Map<String,File> unobfuscatedMapping = configuration.getUnobfuscatedMapping();
-                Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathElements", classpathElements, new Function<String, String>() {
-	                @Override
-	                public String apply(String input)
-	                {
-		                return unobfuscatedMapping.get(input).getPath();
-	                }
-                });
-            } catch (DependencyResolutionRequiredException e) {
-                throw new ObfuscationConfigurationException("Failed to retrieve classpath elements attempting to setup compiler plugin.", e);
-            }
-        }
-
-        // do nothing
+			}
+			else if("compile".equals(mojoExecution.getGoal()))
+			{
+				classpathElements = session.getCurrentProject().getCompileClasspathElements();
+			}
+			else if("testCompile".equals(mojoExecution.getGoal()))
+			{
+				classpathElements = session.getCurrentProject().getTestClasspathElements();
+			}
+			else
+			{
+				return;
+			}
+			final Map<String,File> unobfuscatedMapping = configuration.getUnobfuscatedMapping();
+			Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathElements", classpathElements, new Function<String, String>() {
+				@Override
+				public String apply(String input)
+				{
+					return unobfuscatedMapping.get(input).getPath();
+				}
+			});
+		} catch (DependencyResolutionRequiredException e) {
+			throw new ObfuscationConfigurationException("Failed to retrieve classpath elements attempting to setup compiler plugin.", e);
+		}
     }
 }

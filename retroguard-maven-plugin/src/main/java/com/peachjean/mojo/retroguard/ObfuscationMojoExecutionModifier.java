@@ -6,13 +6,23 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jbunting
- * Date: 4/8/11
- * Time: 1:15 PM
- * To change this template use File | Settings | File Templates.
+ * Interface implemented by lifecycle modifiers.  Multiple steps in the obfuscation lifecycle require small tweaks to
+ * the default lifecycle.  Those tweaks should be implementations of this class that are declared as plexus components.
  */
 public interface ObfuscationMojoExecutionModifier {
 
+	/**
+	 * Provides a list of plugins that this modifier should be applied to.  A null return value indicates "all".  The
+	 * keys should be of the format returned by {@link org.apache.maven.model.Plugin#getKey Plugin.getKey()}.
+	 * @return
+	 */
+	String[] listApplicablePluginKeys();
+
+	/**
+	 * Hook method that provides this modifier with the opportunity to tweak the MojoExecution.
+	 * @param session
+	 * @param mojoExecution
+	 * @param configuration
+	 */
     void modifyExecution(MavenSession session, MojoExecution mojoExecution, ObfuscationConfiguration configuration);
 }
