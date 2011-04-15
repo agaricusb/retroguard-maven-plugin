@@ -10,10 +10,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class JarObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
 {
 
+	private static final String[] APPLICABLE_KEYS = new String[] { "org.apache.maven.plugins:maven-jar-plugin" };
+
 	@Override
 	public String[] listApplicablePluginKeys()
 	{
-		return new String[] { "org.apache.maven.plugins:maven-jar-plugin" };
+		return APPLICABLE_KEYS;
 	}
 
 	@Override

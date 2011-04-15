@@ -5,13 +5,6 @@ import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.annotations.Component;
 
-/**
- * Created by IntelliJ IDEA.
- * User: jbunting
- * Date: 4/9/11
- * Time: 11:17 AM
- * To change this template use File | Settings | File Templates.
- */
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "obfuscating")
 public class ObfuscatingMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 

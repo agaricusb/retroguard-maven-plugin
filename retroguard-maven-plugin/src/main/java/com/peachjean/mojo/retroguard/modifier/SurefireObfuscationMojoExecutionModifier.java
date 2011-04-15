@@ -9,8 +9,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier

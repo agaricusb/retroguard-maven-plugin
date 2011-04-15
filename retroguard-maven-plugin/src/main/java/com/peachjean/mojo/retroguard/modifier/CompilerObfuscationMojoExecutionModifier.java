@@ -1,7 +1,6 @@
 package com.peachjean.mojo.retroguard.modifier;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.peachjean.mojo.retroguard.ObfuscationConfiguration;
 import com.peachjean.mojo.retroguard.ObfuscationConfigurationException;
 import com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier;
@@ -18,10 +17,12 @@ import java.util.Map;
 
 public class CompilerObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
 {
+	private static final String[] APPLICABLE_KEYS = new String[] { "org.apache.maven.plugins:maven-compiler-plugin" };
+
 	@Override
 	public String[] listApplicablePluginKeys()
 	{
-		return new String[] { "org.apache.maven.plugins:maven-compiler-plugin" };
+		return APPLICABLE_KEYS;
 	}
 
 	@Override

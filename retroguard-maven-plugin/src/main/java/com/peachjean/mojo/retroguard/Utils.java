@@ -29,6 +29,7 @@ public class Utils {
     public static final String GEN_SPEC_EXTENSION = "gen-spec";
     public static final String CONTEXT_SPEC_LIST = "specList";
     public static final String CONTEXT_UNOBFUSCATED_MAP = "unobfuscated";
+	private static final String CONFIGURATION_KEY = "obfuscation.Configuration";
 
 	public static void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<String> values)
 	{
@@ -106,7 +107,7 @@ public class Utils {
 
     public static ObfuscationConfiguration getObfuscationConfiguration(MavenSession session)
     {
-	    return (ObfuscationConfiguration) getRetroguardContext(session).get("obfuscation.Configuration");
+	    return (ObfuscationConfiguration) getRetroguardContext(session).get(CONFIGURATION_KEY);
     }
 
     public static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
@@ -125,6 +126,6 @@ public class Utils {
 
 	public static void setObfuscationConfiguration(MavenSession session, ObfuscationConfiguration configuration)
 	{
-		getRetroguardContext(session).put("obfuscation.Configuration", configuration);
+		getRetroguardContext(session).put(CONFIGURATION_KEY, configuration);
 	}
 }
