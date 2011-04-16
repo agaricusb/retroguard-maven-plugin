@@ -113,12 +113,9 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
                     throw new ObfuscationConfigurationException("Attempting to create obfuscation configuration...");
                 }
             }
-			for(ObfuscationMojoExecutionModifier mojoExecutionModifier : modifiers)
+			for(ObfuscationMojoExecutionModifier mojoExecutionModifier : applicableModifiers)
 			{
-				if(Arrays.binarySearch(mojoExecutionModifier.listApplicablePluginKeys(), mojoExecution.getPlugin().getKey()) > 0)
-				{
-					mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);
-				}
+				mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);
 			}
         }
         delegate.mojoStarted(event);

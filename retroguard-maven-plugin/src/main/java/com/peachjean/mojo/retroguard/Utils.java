@@ -24,6 +24,7 @@ public class Utils {
     public static final String OBFUSCATED_TYPE = "obfuscated.jar";
     public static final String SPEC_TYPE = "retroguard-spec";
     public static final String UNOBFUSCATED_TYPE = "unobfuscated.jar";
+	public static final String UNOBFUSCATED_CLASSIFIER = "unobfuscated";
     public static final String OBFUSCATED_EXTENSION = "obfuscated.jar";
     public static final String SPEC_EXTENSION = "rgs";
     public static final String GEN_SPEC_EXTENSION = "gen-spec";

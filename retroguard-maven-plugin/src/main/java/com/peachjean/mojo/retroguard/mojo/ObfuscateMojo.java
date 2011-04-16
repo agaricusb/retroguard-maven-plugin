@@ -92,8 +92,8 @@ public class ObfuscateMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        File jarFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, "jar");
-        File obfuscatedJarFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, Utils.OBFUSCATED_EXTENSION);
+        File jarFile = Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "jar");
+        File obfuscatedJarFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, "jar");
         File obfuscationLogFile = Utils.getArtifactFile(outputDirectory, finalName, classifier, Utils.SPEC_EXTENSION);
 
         try {

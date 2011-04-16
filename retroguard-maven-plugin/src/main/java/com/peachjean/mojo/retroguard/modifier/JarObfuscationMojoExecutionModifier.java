@@ -23,7 +23,7 @@ public class JarObfuscationMojoExecutionModifier implements ObfuscationMojoExecu
         if(mojoExecution.getConfiguration().getChild("classifier") == null)
         {
             Xpp3Dom classifier = new Xpp3Dom("classifier");
-            classifier.setValue(Utils.UNOBFUSCATED_TYPE);
+            classifier.setValue(Utils.UNOBFUSCATED_CLASSIFIER);
             mojoExecution.getConfiguration().addChild(classifier);
         }
     }
