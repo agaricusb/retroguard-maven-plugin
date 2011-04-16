@@ -3,11 +3,11 @@
 	<groupId>com.digitalreasoning.mojo</groupId>
 	<artifactId>retroguard-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.2</version>
 	<name>Retroguard Maven Plugin</name>
     <scm>
         <connection>scm:hg:https://bitbucket.org/jaredbunting/retroguard-maven-plugin</connection>
-        <developerConnection>scm:hg:ssh://hg@hg.bitbucket.com/jaredbunting/retroguard-maven-plugin</developerConnection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org/jaredbunting/retroguard-maven-plugin</developerConnection>
         <url>https://bitbucket.org/jaredbunting/retroguard-maven-plugin</url>
     </scm>
 	<dependencies>
