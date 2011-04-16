@@ -1,8 +1,8 @@
-package com.peachjean.mojo.retroguard.mojo;
+package com.digitalreasoning.mojo.retroguard.mojo;
 
-import com.peachjean.mojo.retroguard.obfuscator.ObfuscationException;
-import com.peachjean.mojo.retroguard.Utils;
-import com.peachjean.mojo.retroguard.obfuscator.MavenObfuscator;
+import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
+import com.digitalreasoning.mojo.retroguard.Utils;
+import com.digitalreasoning.mojo.retroguard.obfuscator.MavenObfuscator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -11,8 +11,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Goal which echoes a string.

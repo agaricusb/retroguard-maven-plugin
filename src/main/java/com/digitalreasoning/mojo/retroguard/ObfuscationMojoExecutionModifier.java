@@ -1,9 +1,7 @@
-package com.peachjean.mojo.retroguard;
+package com.digitalreasoning.mojo.retroguard;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginContainerException;
 
 /**
  * Interface implemented by lifecycle modifiers.  Multiple steps in the obfuscation lifecycle require small tweaks to

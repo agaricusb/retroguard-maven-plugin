@@ -1,10 +1,10 @@
-package com.peachjean.mojo.retroguard.modifier;
+package com.digitalreasoning.mojo.retroguard.modifier;
 
 import com.google.common.base.Function;
-import com.peachjean.mojo.retroguard.ObfuscationConfiguration;
-import com.peachjean.mojo.retroguard.ObfuscationConfigurationException;
-import com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier;
-import com.peachjean.mojo.retroguard.Utils;
+import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
+import com.digitalreasoning.mojo.retroguard.ObfuscationConfigurationException;
+import com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier;
+import com.digitalreasoning.mojo.retroguard.Utils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
@@ -12,7 +12,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

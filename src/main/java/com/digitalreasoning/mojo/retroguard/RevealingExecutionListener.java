@@ -1,12 +1,7 @@
-package com.peachjean.mojo.retroguard;
+package com.digitalreasoning.mojo.retroguard;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.peachjean.mojo.retroguard.ObfuscationConfiguration;
-import com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier;
-import com.peachjean.mojo.retroguard.Utils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -21,7 +16,6 @@ import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.impl.ArtifactResolver;
@@ -96,15 +90,6 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 	        }
             MojoExecution mojoExecution = event.getMojoExecution();
             ObfuscationConfiguration obfuscationConfiguration = Utils.getObfuscationConfiguration(session);
-            if(obfuscationConfiguration == null)
-            {
-                MojoExecution execution = new MojoExecution(session.getCurrentProject().getBuild().getPluginsAsMap().get("com.peachjean.mojo:retroguard-maven-plugin"), "init", "default-init");
-                try {
-                    mojoExecutor.execute(session, Collections.singletonList(execution), new ProjectIndex(session.getProjects()));
-                } catch (LifecycleExecutionException e) {
-                    throw new ObfuscationConfigurationException("Attempting to create obfuscation configuration...");
-                }
-            }
 			for(ObfuscationMojoExecutionModifier mojoExecutionModifier : applicableModifiers)
 			{
 				mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);

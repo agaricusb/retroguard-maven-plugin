@@ -1,31 +1,31 @@
 <component-set>
     <components>
         <component>
-            <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
             <role-hint>compiler</role-hint>
-            <implementation>com.peachjean.mojo.retroguard.modifier.CompilerObfuscationMojoExecutionModifier</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.modifier.CompilerObfuscationMojoExecutionModifier</implementation>
             <isolated-realm>false</isolated-realm>
         </component>
         <component>
-            <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
             <role-hint>surefire</role-hint>
-            <implementation>com.peachjean.mojo.retroguard.modifier.SurefireObfuscationMojoExecutionModifier</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.modifier.SurefireObfuscationMojoExecutionModifier</implementation>
             <isolated-realm>false</isolated-realm>
         </component>
         <component>
-            <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
             <role-hint>jar</role-hint>
-            <implementation>com.peachjean.mojo.retroguard.modifier.JarObfuscationMojoExecutionModifier</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.modifier.JarObfuscationMojoExecutionModifier</implementation>
             <isolated-realm>false</isolated-realm>
         </component>
         <component>
-            <role>com.peachjean.mojo.retroguard.RevealingExecutionListener</role>
+            <role>com.digitalreasoning.mojo.retroguard.RevealingExecutionListener</role>
             <role-hint>default</role-hint>
-            <implementation>com.peachjean.mojo.retroguard.RevealingExecutionListener</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.RevealingExecutionListener</implementation>
             <isolated-realm>false</isolated-realm>
             <requirements>
                 <requirement>
-                    <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+                    <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
                     <field-name>modifiers</field-name>
                 </requirement>
                 <requirement>
@@ -39,10 +39,10 @@
         <component>
             <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
             <role-hint>obfuscated</role-hint>
-            <implementation>com.peachjean.mojo.retroguard.ObfuscatingMavenLifecycleParticipant</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.ObfuscatingMavenLifecycleParticipant</implementation>
             <requirements>
               <requirement>
-                <role>com.peachjean.mojo.retroguard.RevealingExecutionListener</role>
+                <role>com.digitalreasoning.mojo.retroguard.RevealingExecutionListener</role>
               </requirement>
             </requirements>
         </component>
@@ -55,13 +55,13 @@
               <lifecycle>
                 <id>default</id>
                 <phases>
-                  <initialize>com.peachjean.mojo:retroguard-maven-plugin:init</initialize>
+                  <initialize>com.digitalreasoning.mojo:retroguard-maven-plugin:init</initialize>
                   <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
                   <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
                   <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
                   <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
                   <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-                  <package>org.apache.maven.plugins:maven-jar-plugin:jar,com.peachjean.mojo:retroguard-maven-plugin:obfuscate</package>
+                  <package>org.apache.maven.plugins:maven-jar-plugin:jar,com.digitalreasoning.mojo:retroguard-maven-plugin:obfuscate</package>
                   <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                   <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
                 </phases>

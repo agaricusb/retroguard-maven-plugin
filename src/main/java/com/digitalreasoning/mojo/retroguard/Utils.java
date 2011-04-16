@@ -1,19 +1,15 @@
-package com.peachjean.mojo.retroguard;
+package com.digitalreasoning.mojo.retroguard;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -103,7 +99,7 @@ public class Utils {
     private static Map<String, Object> getRetroguardContext(MavenSession session)
     {
         PluginDescriptor desc = new PluginDescriptor();
-        desc.setGroupId( "com.peachjean.mojo" );
+        desc.setGroupId( "com.digitalreasoning.mojo" );
         desc.setArtifactId("retroguard-maven-plugin");
 
         return session.getPluginContext( desc, session.getCurrentProject());

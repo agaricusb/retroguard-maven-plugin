@@ -1,4 +1,4 @@
-package com.peachjean.mojo.retroguard;
+package com.digitalreasoning.mojo.retroguard;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;

@@ -1,10 +1,10 @@
-package com.peachjean.mojo.retroguard.modifier;
+package com.digitalreasoning.mojo.retroguard.modifier;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.peachjean.mojo.retroguard.ObfuscationConfiguration;
-import com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier;
-import com.peachjean.mojo.retroguard.Utils;
+import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
+import com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier;
+import com.digitalreasoning.mojo.retroguard.Utils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;

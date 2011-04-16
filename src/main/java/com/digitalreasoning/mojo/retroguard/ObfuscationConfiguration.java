@@ -1,4 +1,4 @@
-package com.peachjean.mojo.retroguard;
+package com.digitalreasoning.mojo.retroguard;
 
 import java.io.File;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.peachjean.mojo.retroguard.obfuscator;
+package com.digitalreasoning.mojo.retroguard.obfuscator;
 
 public class ObfuscationException extends RuntimeException {
     public ObfuscationException(String message, Object ... args) {

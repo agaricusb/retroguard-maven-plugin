@@ -1,4 +1,4 @@
-package com.peachjean.mojo.retroguard.obfuscator;
+package com.digitalreasoning.mojo.retroguard.obfuscator;
 
 import COM.rl.ant.RGpatchTask;
 import COM.rl.ant.RetroGuardTask;
