@@ -12,6 +12,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,9 +30,9 @@ public class CompilerObfuscationMojoExecutionModifier implements ObfuscationMojo
     public void modifyExecution(MavenSession session, MojoExecution mojoExecution, final ObfuscationConfiguration configuration) {
 		List<String> classpathElements;
 		try {
-			if(mojoExecution.getConfiguration().getChild("classpathElements") != null)
+			Xpp3Dom classpathElementConfig = mojoExecution.getConfiguration().getChild("classpathElements");
+			if(classpathElementConfig != null && classpathElementConfig.getChildren().length > 0)
 			{
-				Xpp3Dom classpathElementConfig = mojoExecution.getConfiguration().getChild("classpathElements");
 				Xpp3Dom[] children = classpathElementConfig.getChildren();
 				classpathElements = new ArrayList<String>(children.length);
 				for(Xpp3Dom child: children)
@@ -52,14 +53,30 @@ public class CompilerObfuscationMojoExecutionModifier implements ObfuscationMojo
 			{
 				return;
 			}
+			if(classpathElementConfig != null)
+			{
+				Xpp3Dom[] children = mojoExecution.getConfiguration().getChildren();
+				for(int i = 0; i < children.length; i++)
+				{
+					if(children[i] == classpathElementConfig)
+					{
+						mojoExecution.getConfiguration().removeChild(i);
+						break;
+					}
+				}
+			}
+			classpathElementConfig = new Xpp3Dom("classpathElements");
+			mojoExecution.getConfiguration().addChild(classpathElementConfig);
 			final Map<String,File> unobfuscatedMapping = configuration.getUnobfuscatedMapping();
 			Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathElements", classpathElements, new Function<String, String>() {
 				@Override
 				public String apply(String input)
 				{
-					return unobfuscatedMapping.get(input).getPath();
+					File mappedFile = unobfuscatedMapping.get(input);
+					return mappedFile != null ? mappedFile.getPath() : input;
 				}
 			});
+//			mojoExecution.getConfiguration().getChild("classpathElements").
 		} catch (DependencyResolutionRequiredException e) {
 			throw new ObfuscationConfigurationException("Failed to retrieve classpath elements attempting to setup compiler plugin.", e);
 		}

@@ -28,6 +28,12 @@
                     <role>com.peachjean.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
                     <field-name>modifiers</field-name>
                 </requirement>
+                <requirement>
+                    <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+                </requirement>
+                <requirement>
+                    <role>org.sonatype.aether.impl.ArtifactResolver</role>
+                </requirement>
             </requirements>
         </component>
         <component>
@@ -68,7 +74,7 @@
           <role-hint>obfuscated.jar</role-hint>
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
-            <type>obfuscated</type>
+            <type>obfuscated.jar</type>
             <extension>jar</extension>
             <language>java</language>
             <addedToClasspath>true</addedToClasspath>
@@ -79,7 +85,7 @@
           <role-hint>unobfuscated.jar</role-hint>
           <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
           <configuration>
-            <type>unobfuscated</type>
+            <type>unobfuscated.jar</type>
             <extension>jar</extension>
             <language>java</language>
             <addedToClasspath>true</addedToClasspath>

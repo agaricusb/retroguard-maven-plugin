@@ -56,8 +56,9 @@ public class Utils {
         {
 	        if(filter.apply(value))
 	        {
-		        Xpp3Dom configValue = new Xpp3Dom("value");
-		        configValue.setValue(converter.apply(value));
+		        String convertedValue = converter.apply(value);
+		        Xpp3Dom configValue = new Xpp3Dom(convertedValue);
+		        configValue.setValue(convertedValue);
 		        configList.addChild(configValue);
 			}
         }

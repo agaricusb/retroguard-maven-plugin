@@ -19,6 +19,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -26,6 +27,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.impl.ArtifactResolver;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResult;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,16 +59,6 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 	 * @component
 	 */
 	protected ArtifactResolver artifactResolver;
-
-	/**
-	 * List of Remote Repositories used by the resolver
-	 *
-	 * @parameter expression="${project.remoteProjectRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	protected List<RemoteRepository> remoteRepositories;
-
 
 
 	private ExecutionListener delegate;
@@ -181,7 +173,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
         delegate.projectSkipped(event);
     }
 
-	private boolean treatAsObfuscatedDependency(Artifact dependency) {
+	private boolean treatAsObfuscatedDependency(Dependency dependency) {
 	    return Utils.OBFUSCATED_TYPE.equals(dependency.getType())
 	            && ("compile".equals(dependency.getScope())
 	                || "provided".equals(dependency.getScope())
@@ -197,32 +189,42 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 			Map<String, File> unobfuscatedMapping = new HashMap<String, File>();
 			Map<String, String> unobfuscatedIdMapping = new HashMap<String, String>();
 
-			for(Artifact dependency: project.getArtifacts())
+			for(Dependency dependency: project.getDependencies())
 			{
 				if(treatAsObfuscatedDependency(dependency))
 				{
 					VersionRange version = null;
-					try {
+					try
+					{
 						version = VersionRange.createFromVersionSpec(dependency.getVersion());
-					} catch (InvalidVersionSpecificationException e) {
+					} catch (InvalidVersionSpecificationException e)
+					{
 						throw new ObfuscationConfigurationException("Could not calculate version for " + dependency.toString(), e);
 					}
 
+					Artifact obfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.OBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
 					Artifact specArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.SPEC_TYPE, dependency.getClassifier(), dependency.getScope());
 					Artifact unobfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.UNOBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
-					try {
+					List<RemoteRepository> remoteRepositories = project.getRemoteProjectRepositories();
+					ArtifactResult specResult;
+					ArtifactResult obfuscatedResult;
+					ArtifactResult unobfuscatedResult;
+					try
+					{
+						ArtifactRequest obfuscatedRequest = new ArtifactRequest(RepositoryUtils.toArtifact(obfuscatedArtifact), remoteRepositories, "retroguard");
+						obfuscatedResult = artifactResolver.resolveArtifact(event.getSession().getRepositorySession(), obfuscatedRequest);
 						ArtifactRequest specRequest = new ArtifactRequest(RepositoryUtils.toArtifact(specArtifact), remoteRepositories, "retroguard");
-						artifactResolver.resolveArtifact(event.getSession().getRepositorySession(), specRequest);
+						specResult = artifactResolver.resolveArtifact(event.getSession().getRepositorySession(), specRequest);
 						ArtifactRequest unobfuscatedRequest = new ArtifactRequest(RepositoryUtils.toArtifact(unobfuscatedArtifact), remoteRepositories, "retroguard");
-						artifactResolver.resolveArtifact(event.getSession().getRepositorySession(), unobfuscatedRequest);
+						unobfuscatedResult = artifactResolver.resolveArtifact(event.getSession().getRepositorySession(), unobfuscatedRequest);
 					} catch (org.sonatype.aether.resolution.ArtifactResolutionException e)
 					{
 						throw new ObfuscationConfigurationException("Failed to locate retroguard artifacts for " + dependency.toString(), e);
 					}
 
-					dependencySpecs.add(specArtifact.getFile());
-					unobfuscatedMapping.put(dependency.getFile().getPath(), unobfuscatedArtifact.getFile());
-					unobfuscatedIdMapping.put(dependency.getId(), unobfuscatedArtifact.getId());
+					dependencySpecs.add(specResult.getArtifact().getFile());
+					unobfuscatedMapping.put(obfuscatedResult.getArtifact().getFile().getPath(), unobfuscatedResult.getArtifact().getFile());
+					unobfuscatedIdMapping.put(obfuscatedArtifact.getId(), unobfuscatedArtifact.getId());
 				}
 			}
 
