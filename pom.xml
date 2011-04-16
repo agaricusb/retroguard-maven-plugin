@@ -13,9 +13,6 @@
     </scm>
     <modules>
         <module>retroguard-maven-plugin</module>
-        <module>retroguard-compiler-maven-plugin</module>
-        <module>retroguard-jar-maven-plugin</module>
-        <module>retroguard-surefire-maven-plugin</module>
     </modules>
     <pluginRepositories>
         <pluginRepository>
@@ -129,6 +126,12 @@
                 <artifactId>maven-plugin-testing-harness</artifactId>
                 <version>1.1</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.maven</groupId>
+                        <artifactId>maven-project</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

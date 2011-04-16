@@ -55,10 +55,7 @@ public class InitMojo extends AbstractMojo {
     /**
      * Used to look up Artifacts in the remote repository.
      *
-     * @parameter expression=
-     * "${component.org.apache.maven.artifact.resolver.ArtifactResolver}"
-     * @required
-     * @readonly
+     * @component
      */
     protected ArtifactResolver artifactResolver;
 
@@ -84,40 +81,40 @@ public class InitMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        List<File> dependencySpecs = new ArrayList<File>();
-        Map<String, File> unobfuscatedMapping = new HashMap<String, File>();
-	    Map<String, String> unobfuscatedIdMapping = new HashMap<String, String>();
-
-	    for(Artifact dependency: project.getArtifacts())
-	    {
-	        if(treatAsObfuscatedDependency(dependency))
-	        {
-	            VersionRange version = null;
-	            try {
-	                version = VersionRange.createFromVersionSpec(dependency.getVersion());
-	            } catch (InvalidVersionSpecificationException e) {
-	                throw new MojoExecutionException("Could not calculate version for " + dependency.toString(), e);
-	            }
-
-	            Artifact specArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.SPEC_TYPE, dependency.getClassifier(), dependency.getScope());
-	            Artifact unobfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.UNOBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
-	            try {
-		            ArtifactRequest specRequest = new ArtifactRequest(RepositoryUtils.toArtifact(specArtifact), remoteRepositories, "retroguard");
-		            artifactResolver.resolveArtifact(localSession.getRepositorySession(), specRequest);
-		            ArtifactRequest unobfuscatedRequest = new ArtifactRequest(RepositoryUtils.toArtifact(unobfuscatedArtifact), remoteRepositories, "retroguard");
-		            artifactResolver.resolveArtifact(localSession.getRepositorySession(), unobfuscatedRequest);
-	            } catch (org.sonatype.aether.resolution.ArtifactResolutionException e)
-	            {
-		            throw new MojoExecutionException("Failed to locate retroguard artifacts for " + dependency.toString(), e);
-	            }
-
-		        dependencySpecs.add(specArtifact.getFile());
-	            unobfuscatedMapping.put(dependency.getFile().getPath(), unobfuscatedArtifact.getFile());
-		        unobfuscatedIdMapping.put(dependency.getId(), unobfuscatedArtifact.getId());
-	        }
-	    }
-
-	    Utils.setObfuscationConfiguration(localSession, new ObfuscationConfiguration(dependencySpecs, unobfuscatedMapping, unobfuscatedIdMapping));
+//        List<File> dependencySpecs = new ArrayList<File>();
+//        Map<String, File> unobfuscatedMapping = new HashMap<String, File>();
+//	    Map<String, String> unobfuscatedIdMapping = new HashMap<String, String>();
+//
+//	    for(Artifact dependency: project.getArtifacts())
+//	    {
+//	        if(treatAsObfuscatedDependency(dependency))
+//	        {
+//	            VersionRange version = null;
+//	            try {
+//	                version = VersionRange.createFromVersionSpec(dependency.getVersion());
+//	            } catch (InvalidVersionSpecificationException e) {
+//	                throw new MojoExecutionException("Could not calculate version for " + dependency.toString(), e);
+//	            }
+//
+//	            Artifact specArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.SPEC_TYPE, dependency.getClassifier(), dependency.getScope());
+//	            Artifact unobfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.UNOBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
+//	            try {
+//		            ArtifactRequest specRequest = new ArtifactRequest(RepositoryUtils.toArtifact(specArtifact), remoteRepositories, "retroguard");
+//		            artifactResolver.resolveArtifact(localSession.getRepositorySession(), specRequest);
+//		            ArtifactRequest unobfuscatedRequest = new ArtifactRequest(RepositoryUtils.toArtifact(unobfuscatedArtifact), remoteRepositories, "retroguard");
+//		            artifactResolver.resolveArtifact(localSession.getRepositorySession(), unobfuscatedRequest);
+//	            } catch (org.sonatype.aether.resolution.ArtifactResolutionException e)
+//	            {
+//		            throw new MojoExecutionException("Failed to locate retroguard artifacts for " + dependency.toString(), e);
+//	            }
+//
+//		        dependencySpecs.add(specArtifact.getFile());
+//	            unobfuscatedMapping.put(dependency.getFile().getPath(), unobfuscatedArtifact.getFile());
+//		        unobfuscatedIdMapping.put(dependency.getId(), unobfuscatedArtifact.getId());
+//	        }
+//	    }
+//
+//	    Utils.initializeConfiguration(localSession, dependencySpecs, unobfuscatedMapping, unobfuscatedIdMapping);
     }
 
 	/**

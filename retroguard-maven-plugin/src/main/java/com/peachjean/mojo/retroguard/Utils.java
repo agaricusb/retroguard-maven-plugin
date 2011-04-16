@@ -29,7 +29,9 @@ public class Utils {
     public static final String GEN_SPEC_EXTENSION = "gen-spec";
     public static final String CONTEXT_SPEC_LIST = "specList";
     public static final String CONTEXT_UNOBFUSCATED_MAP = "unobfuscated";
-	private static final String CONFIGURATION_KEY = "obfuscation.Configuration";
+	private static final String CONFIGURATION_SPECS_KEY = "obfuscation.Configuration.specs";
+	private static final String CONFIGURATION_MAPPING_KEY = "obfuscation.Configuration.mapping";
+	private static final String CONFIGURATION_IDMAPPING_KEY = "obfuscation.Configuration.idmapping";
 
 	public static void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<String> values)
 	{
@@ -107,7 +109,11 @@ public class Utils {
 
     public static ObfuscationConfiguration getObfuscationConfiguration(MavenSession session)
     {
-	    return (ObfuscationConfiguration) getRetroguardContext(session).get(CONFIGURATION_KEY);
+	    Map<String, Object> context = getRetroguardContext(session);
+	    return new ObfuscationConfiguration(
+			    (List<File>)context.get(CONFIGURATION_SPECS_KEY),
+			    (Map<String, File>)context.get(CONFIGURATION_MAPPING_KEY),
+			    (Map<String, String>)context.get(CONFIGURATION_IDMAPPING_KEY));
     }
 
     public static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
@@ -124,8 +130,11 @@ public class Utils {
         return new File( basedir, finalName + classifier + "." + extension );
     }
 
-	public static void setObfuscationConfiguration(MavenSession session, ObfuscationConfiguration configuration)
+	public static void initializeConfiguration(MavenSession session, List<File> dependencySpecs, Map<String, File> unobfuscatedMapping, Map<String, String> unobfuscatedIdMapping)
 	{
-		getRetroguardContext(session).put(CONFIGURATION_KEY, configuration);
+		Map<String, Object> context = getRetroguardContext(session);
+		context.put(CONFIGURATION_SPECS_KEY, dependencySpecs);
+		context.put(CONFIGURATION_MAPPING_KEY, unobfuscatedMapping);
+		context.put(CONFIGURATION_IDMAPPING_KEY, unobfuscatedIdMapping);
 	}
 }

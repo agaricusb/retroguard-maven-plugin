@@ -9,6 +9,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 
+import java.io.File;
 import java.util.Map;
 
 public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
@@ -45,11 +46,11 @@ public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojo
 			}
 		});
 
-		final Map<String, String> idMapping = configuration.getUnobfuscatedIdMapping();
+		final Map<String, File> mapping = configuration.getUnobfuscatedMapping();
 		Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "additionalClasspathElements", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER, new Function<Artifact, String>() {
 			@Override
 			public String apply(Artifact input) {
-				return idMapping.get(input.getId());
+				return mapping.get(input.getFile().getAbsolutePath()).getAbsolutePath();
 			}
 		});
     }

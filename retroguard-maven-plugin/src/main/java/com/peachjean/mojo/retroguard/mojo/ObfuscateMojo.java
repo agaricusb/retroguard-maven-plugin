@@ -98,8 +98,8 @@ public class ObfuscateMojo extends AbstractMojo {
 
         try {
             MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, config, new File(this.outputDirectory, "obfuscation"), getLog(), project, session);
-            obfuscator.setDependentSpecs((Collection<File>) getPluginContext().get(Utils.CONTEXT_SPEC_LIST));
-            obfuscator.setDependentJars(((Map<String, File>)getPluginContext().get(Utils.CONTEXT_UNOBFUSCATED_MAP)).values());
+            obfuscator.setDependentSpecs(Utils.getObfuscationConfiguration(session).getDependencySpecs());
+            obfuscator.setDependentJars(Utils.getObfuscationConfiguration(session).getUnobfuscatedMapping().values());
             obfuscator.obfuscate();
         } catch (ObfuscationException e) {
             throw new MojoFailureException("Could not successfully obfuscate.", e);
