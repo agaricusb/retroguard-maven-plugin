@@ -1,6 +1,11 @@
 <component-set>
     <components>
         <component>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
+            <role-hint>default</role-hint>
+            <implementation>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</implementation>
+        </component>
+        <component>
             <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
             <role-hint>compiler</role-hint>
             <implementation>com.digitalreasoning.mojo.retroguard.modifier.CompilerObfuscationMojoExecutionModifier</implementation>
@@ -39,6 +44,9 @@
                 </requirement>
                 <requirement>
                     <role>org.sonatype.aether.impl.ArtifactResolver</role>
+                </requirement>
+                <requirement>
+                    <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
                 </requirement>
             </requirements>
         </component>

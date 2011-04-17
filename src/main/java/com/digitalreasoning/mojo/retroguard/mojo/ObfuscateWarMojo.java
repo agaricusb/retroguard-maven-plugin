@@ -74,7 +74,7 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		File unobfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "war");
 
-		final ObfuscationConfiguration configuration = Utils.getObfuscationConfiguration(session);
+		final ObfuscationConfiguration configuration = obfuscatedDependencyResolver.getObfuscationConfiguration(session);
 
 		File extractDirectory = new File(outputDirectory, "obfuscated-war");
 

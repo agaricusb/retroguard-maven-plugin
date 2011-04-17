@@ -1,6 +1,7 @@
 package com.digitalreasoning.mojo.retroguard.obfuscator;
 
 import COM.rl.ant.RetroGuardTask;
+import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -17,15 +18,15 @@ public class MavenObfuscator extends Obfuscator {
 
     private Log log;
     private MavenProject project;
-    private MavenSession session;
-    private Class retroGuardTaskClass;
+	private ObfuscationConfiguration obfuscationConfiguration;
+	private Class retroGuardTaskClass;
 
-    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, MavenSession session) throws ObfuscationException
+    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, ObfuscationConfiguration obfuscationConfiguration) throws ObfuscationException
     {
         super(inJar, outJar, obfuscateLog, config, workDir);
         this.log = log;
         this.project = project;
-        this.session = session;
+	    this.obfuscationConfiguration = obfuscationConfiguration;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class MavenObfuscator extends Obfuscator {
             {
                 if(Utils.OBFUSCATED_JAR_TYPE.equals(artifact.getType()))
                 {
-                    childRealm.addURL(Utils.getUnobfuscatedUrl(artifact, session));
+                    childRealm.addURL(Utils.getUnobfuscatedUrl(artifact, obfuscationConfiguration));
                 }
                 else
                 {

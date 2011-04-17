@@ -25,12 +25,6 @@ public class Utils {
 	public static final String UNOBFUSCATED_CLASSIFIER = "unobfuscated";
     public static final String SPEC_EXTENSION = "rgs";
 
-	private static final String CONFIGURATION_SPECS_KEY = "obfuscation.Configuration.specs";
-	private static final String CONFIGURATION_MAPPING_KEY = "obfuscation.Configuration.mapping";
-	private static final String CONFIGURATION_IDMAPPING_KEY = "obfuscation.Configuration.idmapping";
-	private static final String CONFIGURATION_ARTIFACTS_KEY = "obfuscation.Configuration.obfuscatedArtifacts";
-	private static final String CONFIGURATION_UNARTIFACTS_KEY = "obfuscation.Configuration.unobfuscationArtifacts";
-
 	public static void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<String> values)
 	{
 		augmentConfigurationList(configuration, name, values, Functions.<String>identity());
@@ -61,60 +55,17 @@ public class Utils {
         }
     }
 
-//    public static void propagatePrivateFields(Object obj, Class<?> targetClass, String ... fieldNames) throws MojoExecutionException
-//    {
-//        for(String fieldName: fieldNames)
-//        {
-//            try {
-//                Field target = targetClass.getDeclaredField(fieldName);
-//                target.setAccessible(true);
-//                Field source = obj.getClass().getDeclaredField(fieldName);
-//                source.setAccessible(true);
-//
-//                target.set(obj, source.get(obj));
-//            } catch (NoSuchFieldException e) {
-//                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
-//            } catch (IllegalAccessException e) {
-//                throw new MojoExecutionException("Could not propagate field " + fieldName + ", this is probably a programming error.", e);
-//            }
-//        }
-//
-//    }
-//
-//    public static List<String> replaceWithUnobfuscated(List<String> classpathElements, MavenSession session) {
-//        Map<String, Object> pluginContext = getRetroguardContext(session);
-//        final Map<String, File> unobfuscated =
-//                (Map<String, File>) pluginContext.get(CONTEXT_UNOBFUSCATED_MAP);
-//        return Lists.transform(classpathElements, new Function<String, String>() {
-//            @Override
-//            public String apply(String input) {
-//                return unobfuscated.containsKey(input) ? unobfuscated.get(input).getPath() : input;
-//            }
-//        });
-//    }
-
-    public static URL getUnobfuscatedUrl(Artifact obfuscatedArtifact, MavenSession session) throws MalformedURLException {
-	    return getObfuscationConfiguration(session).getUnobfuscatedMapping().get(obfuscatedArtifact.getFile().getPath()).toURI().toURL();
+    public static URL getUnobfuscatedUrl(Artifact obfuscatedArtifact, ObfuscationConfiguration obfuscationConfiguration) throws MalformedURLException {
+	    return obfuscationConfiguration.getUnobfuscatedMapping().get(obfuscatedArtifact.getFile().getPath()).toURI().toURL();
     }
 
-    private static Map<String, Object> getRetroguardContext(MavenSession session)
+    public static Map<String, Object> getRetroguardContext(MavenSession session)
     {
         PluginDescriptor desc = new PluginDescriptor();
         desc.setGroupId( "com.digitalreasoning.mojo" );
         desc.setArtifactId("retroguard-maven-plugin");
 
         return session.getPluginContext( desc, session.getCurrentProject());
-    }
-
-    public static ObfuscationConfiguration getObfuscationConfiguration(MavenSession session)
-    {
-	    Map<String, Object> context = getRetroguardContext(session);
-	    return new ObfuscationConfiguration(
-			    (List<File>)context.get(CONFIGURATION_SPECS_KEY),
-			    (Map<String, File>)context.get(CONFIGURATION_MAPPING_KEY),
-			    (Map<String, String>)context.get(CONFIGURATION_IDMAPPING_KEY),
-			    (List<Artifact>)context.get(CONFIGURATION_ARTIFACTS_KEY),
-			    (List<Artifact>)context.get(CONFIGURATION_UNARTIFACTS_KEY));
     }
 
     public static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
@@ -131,13 +82,4 @@ public class Utils {
         return new File( basedir, finalName + classifier + "." + extension );
     }
 
-	public static void initializeConfiguration(MavenSession session, List<File> dependencySpecs, Map<String, File> unobfuscatedMapping, Map<String, String> unobfuscatedIdMapping, List<Artifact> obfuscatedArtifacts, List<Artifact> unobfuscatedArtifacts)
-	{
-		Map<String, Object> context = getRetroguardContext(session);
-		context.put(CONFIGURATION_SPECS_KEY, dependencySpecs);
-		context.put(CONFIGURATION_MAPPING_KEY, unobfuscatedMapping);
-		context.put(CONFIGURATION_IDMAPPING_KEY, unobfuscatedIdMapping);
-		context.put(CONFIGURATION_ARTIFACTS_KEY, obfuscatedArtifacts);
-		context.put(CONFIGURATION_UNARTIFACTS_KEY, unobfuscatedArtifacts);
-	}
 }
