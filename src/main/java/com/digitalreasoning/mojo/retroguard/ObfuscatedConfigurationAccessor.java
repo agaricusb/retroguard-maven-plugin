@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ObfuscatedDependencyResolver
+public class ObfuscatedConfigurationAccessor
 {
 	private static final String CONFIGURATION_SPECS_KEY = "obfuscation.Configuration.specs";
 	private static final String CONFIGURATION_MAPPING_KEY = "obfuscation.Configuration.mapping";

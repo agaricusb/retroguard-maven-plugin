@@ -2,32 +2,17 @@ package com.digitalreasoning.mojo.retroguard;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.aether.impl.ArtifactResolver;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResult;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RevealingExecutionListener extends AbstractExecutionListener {
 
@@ -37,7 +22,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 	/**
 	 * @component
 	 */
-	protected ObfuscatedDependencyResolver dependencyResolver;
+	protected ObfuscatedConfigurationAccessor configurationAccessor;
 
 	private ExecutionListener delegate;
 
@@ -73,7 +58,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 		        return;
 	        }
             MojoExecution mojoExecution = event.getMojoExecution();
-            ObfuscationConfiguration obfuscationConfiguration = dependencyResolver.getObfuscationConfiguration(session);
+            ObfuscationConfiguration obfuscationConfiguration = configurationAccessor.getObfuscationConfiguration(session);
 			for(ObfuscationMojoExecutionModifier mojoExecutionModifier : applicableModifiers)
 			{
 				mojoExecutionModifier.modifyExecution(session, mojoExecution, obfuscationConfiguration);

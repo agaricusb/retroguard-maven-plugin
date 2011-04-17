@@ -1,9 +1,9 @@
 <component-set>
     <components>
         <component>
-            <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscatedConfigurationAccessor</role>
             <role-hint>default</role-hint>
-            <implementation>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</implementation>
+            <implementation>com.digitalreasoning.mojo.retroguard.ObfuscatedConfigurationAccessor</implementation>
             <requirements>
                 <requirement>
                     <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
@@ -48,7 +48,7 @@
                     <field-name>modifiers</field-name>
                 </requirement>
                 <requirement>
-                    <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
+                    <role>com.digitalreasoning.mojo.retroguard.ObfuscatedConfigurationAccessor</role>
                 </requirement>
             </requirements>
         </component>

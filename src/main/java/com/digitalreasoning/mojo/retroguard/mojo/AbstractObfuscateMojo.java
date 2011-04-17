@@ -1,6 +1,6 @@
 package com.digitalreasoning.mojo.retroguard.mojo;
 
-import com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver;
+import com.digitalreasoning.mojo.retroguard.ObfuscatedConfigurationAccessor;
 import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.MavenObfuscator;
@@ -68,7 +68,7 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 	/**
 	 * @component
 	 */
-	protected ObfuscatedDependencyResolver obfuscatedDependencyResolver;
+	protected ObfuscatedConfigurationAccessor configurationAccessor;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException
@@ -78,7 +78,7 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 	    File obfuscationLogFile = Utils.getArtifactFile(outputDirectory, getFinalName(), classifier, Utils.SPEC_EXTENSION);
 
 	    try {
-		    ObfuscationConfiguration obfuscationConfiguration = obfuscatedDependencyResolver.getObfuscationConfiguration(session);
+		    ObfuscationConfiguration obfuscationConfiguration = configurationAccessor.getObfuscationConfiguration(session);
 	        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, config, new File(this.outputDirectory, "obfuscation"), getLog(), project, obfuscationConfiguration);
 		    obfuscator.setDependentSpecs(obfuscationConfiguration.getDependencySpecs());
 	        obfuscator.setDependentJars(obfuscationConfiguration.getUnobfuscatedMapping().values());

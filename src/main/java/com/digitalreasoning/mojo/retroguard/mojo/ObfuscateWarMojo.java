@@ -4,18 +4,12 @@ import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.war.util.MappingUtils;
-import org.apache.tools.ant.types.selectors.FilenameSelector;
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
-import org.codehaus.plexus.archiver.zip.ZipFile;
 import org.codehaus.plexus.components.io.fileselectors.FileInfo;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -74,7 +68,7 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		File unobfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "war");
 
-		final ObfuscationConfiguration configuration = obfuscatedDependencyResolver.getObfuscationConfiguration(session);
+		final ObfuscationConfiguration configuration = configurationAccessor.getObfuscationConfiguration(session);
 
 		File extractDirectory = new File(outputDirectory, "obfuscated-war");
 
