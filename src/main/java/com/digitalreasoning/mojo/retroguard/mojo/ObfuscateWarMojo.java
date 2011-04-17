@@ -1,10 +1,10 @@
 package com.digitalreasoning.mojo.retroguard.mojo;
 
+import com.digitalreasoning.mojo.retroguard.MappingUtils;
 import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.war.util.MappingUtils;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
