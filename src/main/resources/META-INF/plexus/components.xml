@@ -4,6 +4,14 @@
             <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
             <role-hint>default</role-hint>
             <implementation>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</implementation>
+            <requirements>
+                <requirement>
+                    <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+                </requirement>
+                <requirement>
+                    <role>org.sonatype.aether.impl.ArtifactResolver</role>
+                </requirement>
+            </requirements>
         </component>
         <component>
             <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
@@ -38,12 +46,6 @@
                 <requirement>
                     <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
                     <field-name>modifiers</field-name>
-                </requirement>
-                <requirement>
-                    <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-                </requirement>
-                <requirement>
-                    <role>org.sonatype.aether.impl.ArtifactResolver</role>
                 </requirement>
                 <requirement>
                     <role>com.digitalreasoning.mojo.retroguard.ObfuscatedDependencyResolver</role>
