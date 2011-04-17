@@ -20,7 +20,7 @@ public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojo
 		@Override
 		public boolean apply(Artifact input)
 		{
-			return Utils.OBFUSCATED_TYPE.equals(input.getType());
+			return Utils.OBFUSCATED_JAR_TYPE.equals(input.getType());
 		}
 	};
 

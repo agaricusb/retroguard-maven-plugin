@@ -17,18 +17,19 @@ import java.util.Map;
 
 public class Utils {
 
-    public static final String OBFUSCATED_TYPE = "obfuscated.jar";
+    public static final String OBFUSCATED_JAR_TYPE = "obfuscated.jar";
+	public static final String OBFUSCATED_WAR_TYPE = "obfuscated.war";
     public static final String SPEC_TYPE = "retroguard-spec";
-    public static final String UNOBFUSCATED_TYPE = "unobfuscated.jar";
+    public static final String UNOBFUSCATED_JAR_TYPE = "unobfuscated.jar";
+	public static final String UNOBFUSCATED_WAR_TYPE = "unobfuscated.war";
 	public static final String UNOBFUSCATED_CLASSIFIER = "unobfuscated";
-    public static final String OBFUSCATED_EXTENSION = "obfuscated.jar";
     public static final String SPEC_EXTENSION = "rgs";
-    public static final String GEN_SPEC_EXTENSION = "gen-spec";
-    public static final String CONTEXT_SPEC_LIST = "specList";
-    public static final String CONTEXT_UNOBFUSCATED_MAP = "unobfuscated";
+
 	private static final String CONFIGURATION_SPECS_KEY = "obfuscation.Configuration.specs";
 	private static final String CONFIGURATION_MAPPING_KEY = "obfuscation.Configuration.mapping";
 	private static final String CONFIGURATION_IDMAPPING_KEY = "obfuscation.Configuration.idmapping";
+	private static final String CONFIGURATION_ARTIFACTS_KEY = "obfuscation.Configuration.obfuscatedArtifacts";
+	private static final String CONFIGURATION_UNARTIFACTS_KEY = "obfuscation.Configuration.unobfuscationArtifacts";
 
 	public static void augmentConfigurationList(Xpp3Dom configuration, String name, Iterable<String> values)
 	{
@@ -111,7 +112,9 @@ public class Utils {
 	    return new ObfuscationConfiguration(
 			    (List<File>)context.get(CONFIGURATION_SPECS_KEY),
 			    (Map<String, File>)context.get(CONFIGURATION_MAPPING_KEY),
-			    (Map<String, String>)context.get(CONFIGURATION_IDMAPPING_KEY));
+			    (Map<String, String>)context.get(CONFIGURATION_IDMAPPING_KEY),
+			    (List<Artifact>)context.get(CONFIGURATION_ARTIFACTS_KEY),
+			    (List<Artifact>)context.get(CONFIGURATION_UNARTIFACTS_KEY));
     }
 
     public static File getArtifactFile( File basedir, String finalName, String classifier, String extension )
@@ -128,11 +131,13 @@ public class Utils {
         return new File( basedir, finalName + classifier + "." + extension );
     }
 
-	public static void initializeConfiguration(MavenSession session, List<File> dependencySpecs, Map<String, File> unobfuscatedMapping, Map<String, String> unobfuscatedIdMapping)
+	public static void initializeConfiguration(MavenSession session, List<File> dependencySpecs, Map<String, File> unobfuscatedMapping, Map<String, String> unobfuscatedIdMapping, List<Artifact> obfuscatedArtifacts, List<Artifact> unobfuscatedArtifacts)
 	{
 		Map<String, Object> context = getRetroguardContext(session);
 		context.put(CONFIGURATION_SPECS_KEY, dependencySpecs);
 		context.put(CONFIGURATION_MAPPING_KEY, unobfuscatedMapping);
 		context.put(CONFIGURATION_IDMAPPING_KEY, unobfuscatedIdMapping);
+		context.put(CONFIGURATION_ARTIFACTS_KEY, obfuscatedArtifacts);
+		context.put(CONFIGURATION_UNARTIFACTS_KEY, unobfuscatedArtifacts);
 	}
 }

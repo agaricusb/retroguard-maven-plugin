@@ -11,9 +11,7 @@ import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -27,7 +25,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +71,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
     @Override
     public void mojoStarted(final ExecutionEvent event) {
         MavenSession session = event.getSession();
-        if(Utils.OBFUSCATED_TYPE.equals(session.getCurrentProject().getPackaging()))
+        if(isApplicable(session.getCurrentProject().getPackaging()))
         {
 	        Collection<ObfuscationMojoExecutionModifier> applicableModifiers = Collections2.filter(modifiers, new Predicate<ObfuscationMojoExecutionModifier>()
 	        {
@@ -159,7 +156,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
     }
 
 	private boolean treatAsObfuscatedDependency(Dependency dependency) {
-	    return Utils.OBFUSCATED_TYPE.equals(dependency.getType())
+	    return (isApplicable(dependency.getType()))
 	            && ("compile".equals(dependency.getScope())
 	                || "provided".equals(dependency.getScope())
 	                || "runtime".equals(dependency.getScope()));
@@ -167,12 +164,15 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 
     @Override
     public void projectStarted(ExecutionEvent event) {
-	    if(Utils.OBFUSCATED_TYPE.equals(event.getSession().getCurrentProject().getPackaging()))
+	    String packaging = event.getSession().getCurrentProject().getPackaging();
+	    if(isApplicable(packaging))
 	    {
 			MavenProject project = event.getSession().getCurrentProject();
 			List<File> dependencySpecs = new ArrayList<File>();
 			Map<String, File> unobfuscatedMapping = new HashMap<String, File>();
 			Map<String, String> unobfuscatedIdMapping = new HashMap<String, String>();
+		    List<Artifact> obfuscatedArtifacts = new ArrayList<Artifact>();
+		    List<Artifact> unobfuscatedArtifacts = new ArrayList<Artifact>();
 
 			for(Dependency dependency: project.getDependencies())
 			{
@@ -187,9 +187,9 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 						throw new ObfuscationConfigurationException("Could not calculate version for " + dependency.toString(), e);
 					}
 
-					Artifact obfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.OBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
+					Artifact obfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.OBFUSCATED_JAR_TYPE, dependency.getClassifier(), dependency.getScope());
 					Artifact specArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.SPEC_TYPE, dependency.getClassifier(), dependency.getScope());
-					Artifact unobfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.UNOBFUSCATED_TYPE, dependency.getClassifier(), dependency.getScope());
+					Artifact unobfuscatedArtifact = factory.createDependencyArtifact(dependency.getGroupId(), dependency.getArtifactId(), version, Utils.UNOBFUSCATED_JAR_TYPE, dependency.getClassifier(), dependency.getScope());
 					List<RemoteRepository> remoteRepositories = project.getRemoteProjectRepositories();
 					ArtifactResult specResult;
 					ArtifactResult obfuscatedResult;
@@ -210,15 +210,22 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 					dependencySpecs.add(specResult.getArtifact().getFile());
 					unobfuscatedMapping.put(obfuscatedResult.getArtifact().getFile().getPath(), unobfuscatedResult.getArtifact().getFile());
 					unobfuscatedIdMapping.put(obfuscatedArtifact.getId(), unobfuscatedArtifact.getId());
+					obfuscatedArtifacts.add(RepositoryUtils.toArtifact(obfuscatedResult.getArtifact()));
+					unobfuscatedArtifacts.add(RepositoryUtils.toArtifact(unobfuscatedResult.getArtifact()));
 				}
 			}
 
-			Utils.initializeConfiguration(event.getSession(), dependencySpecs, unobfuscatedMapping, unobfuscatedIdMapping);
+			Utils.initializeConfiguration(event.getSession(), dependencySpecs, unobfuscatedMapping, unobfuscatedIdMapping, obfuscatedArtifacts, unobfuscatedArtifacts);
         }
         delegate.projectStarted(event);
     }
 
-    @Override
+	private boolean isApplicable(String packaging)
+	{
+		return Utils.OBFUSCATED_JAR_TYPE.equals(packaging) || Utils.OBFUSCATED_WAR_TYPE.equals(packaging);
+	}
+
+	@Override
     public void projectSucceeded(ExecutionEvent event) {
         delegate.projectSucceeded(event);
     }

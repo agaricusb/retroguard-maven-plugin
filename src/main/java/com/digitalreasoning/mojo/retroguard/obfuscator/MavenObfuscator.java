@@ -35,7 +35,7 @@ public class MavenObfuscator extends Obfuscator {
             ClassRealm childRealm = pluginRealm.createChildRealm(project.getId() + "-retroguard-task");
             for(Artifact artifact: (List<Artifact>) project.getCompileArtifacts())
             {
-                if(Utils.OBFUSCATED_TYPE.equals(artifact.getType()))
+                if(Utils.OBFUSCATED_JAR_TYPE.equals(artifact.getType()))
                 {
                     childRealm.addURL(Utils.getUnobfuscatedUrl(artifact, session));
                 }

@@ -19,6 +19,12 @@
             <isolated-realm>false</isolated-realm>
         </component>
         <component>
+            <role>com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier</role>
+            <role-hint>war</role-hint>
+            <implementation>com.digitalreasoning.mojo.retroguard.modifier.WarObfuscationMojoExecutionModifier</implementation>
+            <isolated-realm>false</isolated-realm>
+        </component>
+        <component>
             <role>com.digitalreasoning.mojo.retroguard.RevealingExecutionListener</role>
             <role-hint>default</role-hint>
             <implementation>com.digitalreasoning.mojo.retroguard.RevealingExecutionListener</implementation>
@@ -55,16 +61,38 @@
               <lifecycle>
                 <id>default</id>
                 <phases>
-                  <initialize>com.digitalreasoning.mojo:retroguard-maven-plugin:init</initialize>
-                  <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-                  <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-                  <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
-                  <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-                  <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-                  <package>org.apache.maven.plugins:maven-jar-plugin:jar,com.digitalreasoning.mojo:retroguard-maven-plugin:obfuscate</package>
-                  <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-                  <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+                  <process-resources>org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources</process-resources>
+                  <compile>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile</compile>
+                  <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:2.4.3:testResources</process-test-resources>
+                  <test-compile>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile</test-compile>
+                  <test>org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test</test>
+                  <package>org.apache.maven.plugins:maven-jar-plugin:2.3.1:jar,com.digitalreasoning.mojo:retroguard-maven-plugin:jarObfuscate</package>
+                  <install>org.apache.maven.plugins:maven-install-plugin:2.3.1:install</install>
+                  <deploy>org.apache.maven.plugins:maven-deploy-plugin:2.5:deploy</deploy>
                 </phases>
+              </lifecycle>
+            </lifecycles>
+          </configuration>
+        </component>
+        <component>
+          <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+          <role-hint>obfuscated.war</role-hint>
+          <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+          <configuration>
+            <lifecycles>
+              <lifecycle>
+                <id>default</id>
+                <phases>
+                  <process-resources>org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources</process-resources>
+                  <compile>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile</compile>
+                  <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:2.4.3:testResources</process-test-resources>
+                  <test-compile>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile</test-compile>
+                  <test>org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test</test>
+                  <package>org.apache.maven.plugins:maven-war-plugin:2.1.1:war,com.digitalreasoning.mojo:retroguard-maven-plugin:warObfuscate</package>
+                  <install>org.apache.maven.plugins:maven-install-plugin:2.3.1:install</install>
+                  <deploy>org.apache.maven.plugins:maven-deploy-plugin:2.5:deploy</deploy>
+                </phases>
+
               </lifecycle>
             </lifecycles>
           </configuration>
@@ -91,6 +119,31 @@
             <addedToClasspath>true</addedToClasspath>
             <classifier>unobfuscated</classifier>
           </configuration>
+        </component>
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>obfuscated.war</role-hint>
+            <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+            <configuration>
+                <type>obfuscated.war</type>
+                <extension>war</extension>
+                <includesDependencies>true</includesDependencies>
+                <language>java</language>
+                <addedToClasspath>false</addedToClasspath>
+            </configuration>
+        </component>
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>unobfuscated.war</role-hint>
+            <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+            <configuration>
+                <type>unobfuscated.war</type>
+                <extension>war</extension>
+                <includesDependencies>true</includesDependencies>
+                <language>java</language>
+                <addedToClasspath>false</addedToClasspath>
+                <classifier>unobfuscated</classifier>
+            </configuration>
         </component>
         <component>
           <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
