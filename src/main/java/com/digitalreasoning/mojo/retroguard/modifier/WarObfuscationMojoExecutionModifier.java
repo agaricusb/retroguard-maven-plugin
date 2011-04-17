@@ -1,20 +1,18 @@
 package com.digitalreasoning.mojo.retroguard.modifier;
 
+import com.digitalreasoning.mojo.retroguard.MappingUtils;
 import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.ObfuscationMojoExecutionModifier;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
+import com.google.common.base.Strings;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.war.util.MappingUtils;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
 public class WarObfuscationMojoExecutionModifier implements ObfuscationMojoExecutionModifier
@@ -57,7 +55,7 @@ public class WarObfuscationMojoExecutionModifier implements ObfuscationMojoExecu
 		{
 			outputFileNameMapping = outputFileNameMappingConfig.getValue();
 		}
-		if(StringUtils.isBlank(outputFileNameMapping))
+		if(Strings.isNullOrEmpty(outputFileNameMapping))
 		{
 			outputFileNameMapping = "@{artifactId}@-@{version}@@{dashClassifier?}@.@{extension}@";
 		}
@@ -79,7 +77,7 @@ public class WarObfuscationMojoExecutionModifier implements ObfuscationMojoExecu
 			mojoExecution.getConfiguration().addChild(excludesConfig);
 		}
 		String obfuscatedExcludes = StringUtils.join(excludeParts, ",");
-		if(StringUtils.isBlank(excludesConfig.getValue()))
+		if(Strings.isNullOrEmpty(excludesConfig.getValue()))
 		{
 			excludesConfig.setValue(obfuscatedExcludes);
 		}
