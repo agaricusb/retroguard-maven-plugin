@@ -49,12 +49,21 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	private String classesClassifier = "classes";
 
 	/**
-	 * To look up Archiver/UnArchiver implementations.
+	 * The WAR archiver.
 	 *
-	 * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
-	 * @required
+	 * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="war"
 	 */
-	private ArchiverManager archiverManager;
+	private WarArchiver warArchiver;
+
+	/**
+	 * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="war"
+	 */
+	private UnArchiver warUnArchiver;
+
+	/**
+	 * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="jar"
+	 */
+	private UnArchiver jarUnArchiver;
 
 
 	@Override
@@ -90,14 +99,10 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		try
 		{
-			WarArchiver warArchiver = (WarArchiver) archiverManager.getArchiver(obfuscatedWar);
 			warArchiver.setIgnoreWebxml(false);
 			warArchiver.setDestFile(obfuscatedWar);
 			warArchiver.addDirectory(extractDirectory);
 			warArchiver.createArchive();
-		} catch (NoSuchArchiverException e)
-		{
-			throw new ObfuscationException("Could not find war archiver.", e);
 		} catch (ArchiverException e)
 		{
 			throw new ObfuscationException("Failed to create obfuscated war file.", e);
@@ -126,13 +131,9 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		try
 		{
-			UnArchiver unArchiver = archiverManager.getUnArchiver(obfuscatedJarFile);
-			unArchiver.setSourceFile(obfuscatedJarFile);
-			unArchiver.setDestFile(classesDir);
-			unArchiver.extract();
-		} catch (NoSuchArchiverException e)
-		{
-			throw new ObfuscationException("Could not locate jar unarchiver.", e);
+			jarUnArchiver.setSourceFile(obfuscatedJarFile);
+			jarUnArchiver.setDestFile(classesDir);
+			jarUnArchiver.extract();
 		} catch (ArchiverException e)
 		{
 			throw new ObfuscationException("Failed to extract obfuscated jar.", e);
@@ -156,23 +157,25 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 		}
 		try
 		{
-			UnArchiver unArchiver = archiverManager.getUnArchiver(unobfuscatedWar);
-			unArchiver.setSourceFile(unobfuscatedWar);
-			unArchiver.setDestFile(extractDirectory);
-			unArchiver.setFileSelectors(new FileSelector[] {
-					new FileSelector() {
+			warUnArchiver.setSourceFile(unobfuscatedWar);
+			warUnArchiver.setDestFile(extractDirectory);
+			warUnArchiver.setFileSelectors(new FileSelector[]{
+					new FileSelector()
+					{
 						/**
 						 * Exclude classes directory and unobfuscated jars.
 						 */
 						@Override
 						public boolean isSelected(FileInfo fileInfo) throws IOException
 						{
-							if("WEB-INF/classes".equals(fileInfo.getName())) {
+							if ("WEB-INF/classes".equals(fileInfo.getName()))
+							{
 								return false;
 							}
-							if(fileInfo.getName().startsWith("WEB-INF/lib/")) {
-								String name = fileInfo.getName().replace("WEB-INF/lib/","");
-								if(mappedUnobfuscatedNames.contains(name))
+							if (fileInfo.getName().startsWith("WEB-INF/lib/"))
+							{
+								String name = fileInfo.getName().replace("WEB-INF/lib/", "");
+								if (mappedUnobfuscatedNames.contains(name))
 								{
 									return false;
 								}
@@ -181,10 +184,7 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 						}
 					}
 			});
-			unArchiver.extract();
-		} catch (NoSuchArchiverException e)
-		{
-			throw new ObfuscationException("Could not locate war unarchiver.", e);
+			warUnArchiver.extract();
 		} catch (ArchiverException e)
 		{
 			throw new ObfuscationException("Failed to extract unobfuscated war.", e);
