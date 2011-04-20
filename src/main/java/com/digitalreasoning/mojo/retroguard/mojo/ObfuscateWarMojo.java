@@ -7,8 +7,6 @@ import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileInfo;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
@@ -65,7 +63,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	 */
 	private UnArchiver jarUnArchiver;
 
-
 	@Override
 	public String getFinalName()
 	{
@@ -84,13 +81,22 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 		File classesDir = new File(extractDirectory, "WEB-INF/classes");
 		File obfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, null, "war");
 
-		initStagingDirectory(unobfuscatedWar, extractDirectory, classesDir, configuration);
+		if(!obfuscatedWar.exists()
+				|| obfuscatedJarFile.lastModified() > obfuscatedWar.lastModified()
+				|| unobfuscatedWar.lastModified() > obfuscatedWar.lastModified())
+		{
+			initStagingDirectory(unobfuscatedWar, extractDirectory, classesDir, configuration);
 
-		addObfuscatedClassesToStaging(obfuscatedJarFile, classesDir);
+			addObfuscatedClassesToStaging(obfuscatedJarFile, classesDir);
 
-		stageObfuscatedDependencies(configuration, extractDirectory);
+			stageObfuscatedDependencies(configuration, extractDirectory);
 
-		createObfuscatedWar(extractDirectory, obfuscatedWar);
+			createObfuscatedWar(extractDirectory, obfuscatedWar);
+		}
+		else
+		{
+			getLog().info("Previously obfuscated war still current, not building obfuscated war...");
+		}
 
 		project.getArtifact().setFile(obfuscatedWar);
 	}
