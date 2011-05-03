@@ -24,7 +24,6 @@ import java.util.List;
  * @goal warObfuscate
  * @phase package
  * @requiresProject
- * @requiresDependencyResolution runtime
  */
 
 public class ObfuscateWarMojo extends AbstractObfuscateMojo
