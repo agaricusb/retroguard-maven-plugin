@@ -18,7 +18,6 @@ import java.io.File;
  * @goal jarObfuscate
  * @phase package
  * @requiresProject
- * @requiresDependencyResolution runtime
  */
 public class ObfuscateJarMojo extends AbstractObfuscateMojo
 {

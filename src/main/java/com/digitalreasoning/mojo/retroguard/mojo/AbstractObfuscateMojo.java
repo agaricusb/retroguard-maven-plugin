@@ -15,11 +15,7 @@ import org.apache.maven.project.MavenProjectHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jbunting
- * Date: 4/16/11
- * Time: 4:12 PM
- * To change this template use File | Settings | File Templates.
+ * @requiresDependencyResolution compile
  */
 public abstract class AbstractObfuscateMojo extends AbstractMojo
 {
