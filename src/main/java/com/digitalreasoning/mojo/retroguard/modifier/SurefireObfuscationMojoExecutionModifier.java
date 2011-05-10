@@ -37,6 +37,10 @@ public class SurefireObfuscationMojoExecutionModifier implements ObfuscationMojo
 
 	@Override
     public void modifyExecution(MavenSession session, MojoExecution mojoExecution, ObfuscationConfiguration configuration) {
+		if(!mojoExecution.getGoal().endsWith("test"))
+		{
+			return;
+		}
 		Utils.augmentConfigurationList(mojoExecution.getConfiguration(), "classpathDependencyExcludes", session.getCurrentProject().getArtifacts(), OBFUSCATED_ARTIFACT_FILTER,    new Function<Artifact, String>()
 		{
 			@Override
