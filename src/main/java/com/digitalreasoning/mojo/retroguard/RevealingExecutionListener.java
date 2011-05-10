@@ -2,6 +2,7 @@ package com.digitalreasoning.mojo.retroguard;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
@@ -50,7 +51,7 @@ public class RevealingExecutionListener extends AbstractExecutionListener {
 		        @Override
 		        public boolean apply(ObfuscationMojoExecutionModifier input)
 		        {
-			        return Arrays.binarySearch(input.listApplicablePluginKeys(), event.getMojoExecution().getPlugin().getKey()) >= 0;
+			        return ArrayUtils.contains(input.listApplicablePluginKeys(), event.getMojoExecution().getPlugin().getKey());
 		        }
 	        });
 	        if(applicableModifiers.isEmpty())
