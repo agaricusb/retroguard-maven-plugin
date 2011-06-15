@@ -1,22 +1,16 @@
 package com.digitalreasoning.mojo.retroguard.mojo;
 
-import com.digitalreasoning.mojo.retroguard.MappingUtils;
-import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
-import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileInfo;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Goal which obfuscates a war file.
@@ -37,13 +31,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	private String finalName;
 
 	private String outputFileNameMapping = "@{artifactId}@-@{version}@@{dashClassifier?}@.@{extension}@";
-	/**
-	 * The classifier to use for the attached classes artifact.
-	 *
-	 * @parameter default-value="classes"
-	 * @since 2.1-alpha-2
-	 */
-	private String classesClassifier = "classes";
 
 	/**
 	 * The WAR archiver.
@@ -62,6 +49,21 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	 */
 	private UnArchiver jarUnArchiver;
 
+	/**
+	 * Jar that we wish to obfuscate.
+	 *
+	 * @parameter
+	 */
+	protected File unobfuscatedJar;
+
+	/**
+	 * Classifier for the unobfuscated jar.  If unobfuscatedJar is specified, this will be ignored.
+	 *
+	 * @parameter
+	 */
+	protected String unobfuscatedClassifier;
+
+
 	@Override
 	public String getFinalName()
 	{
@@ -73,8 +75,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		File unobfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "war");
 
-		final ObfuscationConfiguration configuration = configurationAccessor.getObfuscationConfiguration(session);
-
 		File extractDirectory = new File(outputDirectory, "obfuscated-war");
 
 		File classesDir = new File(extractDirectory, "WEB-INF/classes");
@@ -84,11 +84,9 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 				|| obfuscatedJarFile.lastModified() > obfuscatedWar.lastModified()
 				|| unobfuscatedWar.lastModified() > obfuscatedWar.lastModified())
 		{
-			initStagingDirectory(unobfuscatedWar, extractDirectory, classesDir, configuration);
+			initStagingDirectory(unobfuscatedWar, extractDirectory, classesDir);
 
 			addObfuscatedClassesToStaging(obfuscatedJarFile, classesDir);
-
-			stageObfuscatedDependencies(configuration, extractDirectory);
 
 			createObfuscatedWar(extractDirectory, obfuscatedWar);
 		}
@@ -107,6 +105,8 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 			warArchiver.setIgnoreWebxml(false);
 			warArchiver.setDestFile(obfuscatedWar);
 			warArchiver.addDirectory(extractDirectory);
+//			use this!
+//			warArchiver.addArchivedFileSet();
 			warArchiver.createArchive();
 		} catch (ArchiverException e)
 		{
@@ -114,21 +114,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 		} catch (IOException e)
 		{
 			throw new ObfuscationException("Failed to create obfuscated war file.", e);
-		}
-	}
-
-	private void stageObfuscatedDependencies(ObfuscationConfiguration configuration, File extractDirectory)
-	{
-		File libDir = new File(extractDirectory, "WEB-INF/lib");
-		try
-		{
-			for(Artifact obfuscatedDependency: configuration.getObfuscatedArtifacts())
-			{
-				FileUtils.copyFileToDirectoryIfModified(obfuscatedDependency.getFile(), libDir);
-			}
-		} catch (IOException e)
-		{
-			throw new ObfuscationException("Could not stage obfuscated dependencies properly.", e);
 		}
 	}
 
@@ -145,21 +130,10 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 		}
 	}
 
-	private void initStagingDirectory(File unobfuscatedWar, File extractDirectory, File classesDir, ObfuscationConfiguration configuration)
+	private void initStagingDirectory(File unobfuscatedWar, File extractDirectory, File classesDir)
 	{
 		// create staging directory by unzipping the unobfuscated war
 		extractDirectory.mkdirs();
-		final List<String> mappedUnobfuscatedNames = new ArrayList<String>(configuration.getUnobfuscatedArtifacts().size());
-		try
-		{
-			for(Artifact artifact: configuration.getUnobfuscatedArtifacts())
-			{
-				mappedUnobfuscatedNames.add(MappingUtils.evaluateFileNameMapping(outputFileNameMapping, artifact));
-			}
-		} catch (InterpolationException e)
-		{
-			throw new ObfuscationException("Could not determine mapped names of unobfuscated dependencies.", e);
-		}
 		try
 		{
 			warUnArchiver.setSourceFile(unobfuscatedWar);
@@ -176,14 +150,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 							if ("WEB-INF/classes".equals(fileInfo.getName()))
 							{
 								return false;
-							}
-							if (fileInfo.getName().startsWith("WEB-INF/lib/"))
-							{
-								String name = fileInfo.getName().replace("WEB-INF/lib/", "");
-								if (mappedUnobfuscatedNames.contains(name))
-								{
-									return false;
-								}
 							}
 							return true;
 						}
@@ -207,12 +173,12 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	@Override
 	protected File getOutputJar()
 	{
-		return Utils.getArtifactFile(outputDirectory, finalName, "obfuscated", "jar");
+		return Utils.getArtifactFile(outputDirectory, finalName, classifier, "jar");
 	}
 
 	@Override
 	protected File getInputJar()
 	{
-		return Utils.getArtifactFile(outputDirectory, finalName, classesClassifier, "jar");
+		return unobfuscatedJar == null ? Utils.getArtifactFile(outputDirectory, finalName, unobfuscatedClassifier, "jar") : unobfuscatedJar;
 	}
 }

@@ -55,10 +55,6 @@ public class Utils {
         }
     }
 
-    public static URL getUnobfuscatedUrl(Artifact obfuscatedArtifact, ObfuscationConfiguration obfuscationConfiguration) throws MalformedURLException {
-	    return obfuscationConfiguration.getUnobfuscatedMapping().get(obfuscatedArtifact.getFile().getPath()).toURI().toURL();
-    }
-
     public static Map<String, Object> getRetroguardContext(MavenSession session)
     {
         PluginDescriptor desc = new PluginDescriptor();

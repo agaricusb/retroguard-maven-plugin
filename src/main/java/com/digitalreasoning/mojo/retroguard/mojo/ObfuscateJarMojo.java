@@ -30,6 +30,20 @@ public class ObfuscateJarMojo extends AbstractObfuscateMojo
 	 */
 	protected String finalName;
 
+	/**
+	 * Jar that we wish to obfuscate.
+	 *
+	 * @parameter
+	 */
+	protected File unobfuscatedJar;
+
+	/**
+	 * Classifier for the unobfuscated jar.  If unobfuscatedJar is specified, this will be ignored.
+	 *
+	 * @parameter
+	 */
+	protected String unobfuscatedClassifier;
+
 	public ObfuscateJarMojo() {
     }
 
@@ -68,6 +82,6 @@ public class ObfuscateJarMojo extends AbstractObfuscateMojo
 	@Override
 	protected File getInputJar()
 	{
-		return Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "jar");
+		return unobfuscatedJar == null ? Utils.getArtifactFile(outputDirectory, finalName, unobfuscatedClassifier, "jar") : unobfuscatedJar;
 	}
 }

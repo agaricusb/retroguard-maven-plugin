@@ -53,7 +53,12 @@ public abstract class Obfuscator {
         this.dependentJars = dependentJars;
     }
 
-    public void setDependentSpecs(Collection<File> dependentSpecs) {
+	protected Collection<File> getDependentJars()
+	{
+		return dependentJars;
+	}
+
+	public void setDependentSpecs(Collection<File> dependentSpecs) {
         this.dependentSpecs = dependentSpecs;
     }
 

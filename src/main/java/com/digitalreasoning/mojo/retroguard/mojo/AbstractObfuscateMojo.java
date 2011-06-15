@@ -1,7 +1,5 @@
 package com.digitalreasoning.mojo.retroguard.mojo;
 
-import com.digitalreasoning.mojo.retroguard.ObfuscatedConfigurationAccessor;
-import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.MavenObfuscator;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
@@ -61,23 +59,16 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 	 */
 	private File config;
 
-	/**
-	 * @component
-	 */
-	protected ObfuscatedConfigurationAccessor configurationAccessor;
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
+		long start = System.currentTimeMillis();
 	    File jarFile = getInputJar();
 	    File obfuscatedJarFile = getOutputJar();
 	    File obfuscationLogFile = Utils.getArtifactFile(outputDirectory, getFinalName(), classifier, Utils.SPEC_EXTENSION);
 
 	    try {
-		    ObfuscationConfiguration obfuscationConfiguration = configurationAccessor.getObfuscationConfiguration(session);
-	        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, config, new File(this.outputDirectory, "obfuscation"), getLog(), project, obfuscationConfiguration);
-		    obfuscator.setDependentSpecs(obfuscationConfiguration.getDependencySpecs());
-	        obfuscator.setDependentJars(obfuscationConfiguration.getUnobfuscatedMapping().values());
+	        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, config, new File(this.outputDirectory, "obfuscation"), getLog(), project);
 	        obfuscator.obfuscate();
 	    } catch (ObfuscationException e) {
 	        throw new MojoFailureException("Could not successfully obfuscate.", e);
@@ -87,6 +78,7 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 
 		projectHelper.attachArtifact( project, Utils.SPEC_TYPE, classifier, obfuscationLogFile);
 
+		getLog().info("Obfuscation Complete: " + (System.currentTimeMillis() - start)/1000.0 + "s");
 	}
 
 	public abstract String getFinalName();

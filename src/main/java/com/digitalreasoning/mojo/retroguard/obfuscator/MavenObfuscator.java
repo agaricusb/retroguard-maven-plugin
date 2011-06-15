@@ -1,10 +1,11 @@
 package com.digitalreasoning.mojo.retroguard.obfuscator;
 
 import COM.rl.ant.RetroGuardTask;
-import com.digitalreasoning.mojo.retroguard.ObfuscationConfiguration;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -12,21 +13,21 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class MavenObfuscator extends Obfuscator {
 
     private Log log;
     private MavenProject project;
-	private ObfuscationConfiguration obfuscationConfiguration;
 	private Class retroGuardTaskClass;
 
-    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project, ObfuscationConfiguration obfuscationConfiguration) throws ObfuscationException
+    public MavenObfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project) throws ObfuscationException
     {
         super(inJar, outJar, obfuscateLog, config, workDir);
         this.log = log;
         this.project = project;
-	    this.obfuscationConfiguration = obfuscationConfiguration;
     }
 
     @Override
@@ -34,16 +35,36 @@ public class MavenObfuscator extends Obfuscator {
         try {
             ClassRealm pluginRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
             ClassRealm childRealm = pluginRealm.createChildRealm(project.getId() + "-retroguard-task");
-            for(Artifact artifact: (List<Artifact>) project.getCompileArtifacts())
+	        ArtifactFilter specFilter = new ArtifactFilter()
+	        {
+		        @Override
+		        public boolean include(Artifact artifact)
+		        {
+			        return Utils.SPEC_TYPE.equals(artifact.getType());
+		        }
+	        };
+	        ArtifactFilter classpathFilter = new AndArtifactFilter(Arrays.asList(new ScopeArtifactFilter(Artifact.SCOPE_COMPILE),
+			        new ArtifactFilter()
+			        {
+				        @Override
+				        public boolean include(Artifact artifact)
+				        {
+					        return artifact.isResolved() && !MavenObfuscator.this.getDependentJars().contains(artifact.getFile());
+				        }
+			        }));
+	        Collection<Artifact> dependentSpecs = new ArrayList<Artifact>();
+	        Collection<Artifact> dependentJars = new ArrayList<Artifact>();
+            for(Artifact artifact: project.getArtifacts())
             {
-                if(Utils.OBFUSCATED_JAR_TYPE.equals(artifact.getType()))
-                {
-                    childRealm.addURL(Utils.getUnobfuscatedUrl(artifact, obfuscationConfiguration));
-                }
-                else
-                {
+	            if(classpathFilter.include(artifact))
+	            {
                     childRealm.addURL(artifact.getFile().toURI().toURL());
                 }
+	            if(specFilter.include(artifact))
+	            {
+		            dependentSpecs.add(artifact);
+		            project.getArtifactMap();
+	            }
             }
             for(URL constituent: pluginRealm.getURLs())
             {
