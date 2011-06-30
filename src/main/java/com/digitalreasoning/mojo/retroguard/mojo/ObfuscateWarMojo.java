@@ -59,7 +59,7 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	/**
 	 * Classifier for the unobfuscated jar.  If unobfuscatedJar is specified, this will be ignored.
 	 *
-	 * @parameter
+	 * @parameter default-value="classes"
 	 */
 	protected String unobfuscatedClassifier;
 
@@ -75,38 +75,41 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	{
 		File unobfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, Utils.UNOBFUSCATED_CLASSIFIER, "war");
 
-		File extractDirectory = new File(outputDirectory, "obfuscated-war");
-
-		File classesDir = new File(extractDirectory, "WEB-INF/classes");
-		File obfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, null, "war");
+		File obfuscatedWar = Utils.getArtifactFile(outputDirectory, finalName, classifier, "war");
 
 		if(!obfuscatedWar.exists()
 				|| obfuscatedJarFile.lastModified() > obfuscatedWar.lastModified()
 				|| unobfuscatedWar.lastModified() > obfuscatedWar.lastModified())
 		{
-			initStagingDirectory(unobfuscatedWar, extractDirectory, classesDir);
-
-			addObfuscatedClassesToStaging(obfuscatedJarFile, classesDir);
-
-			createObfuscatedWar(extractDirectory, obfuscatedWar);
+			createObfuscatedWar(obfuscatedWar, unobfuscatedWar, obfuscatedJarFile);
 		}
 		else
 		{
 			getLog().info("Previously obfuscated war still current, not building obfuscated war...");
 		}
 
-		project.getArtifact().setFile(obfuscatedWar);
+		if ( classifier != null )
+		{
+			projectHelper.attachArtifact( project, "war", classifier, obfuscatedWar);
+		    projectHelper.attachArtifact( project, "jar", classifier, obfuscatedJarFile );
+		}
+		else
+		{
+			project.getArtifact().setFile(obfuscatedWar);
+			projectHelper.attachArtifact( project, "jar", obfuscatedJarFile );
+		}
 	}
 
-	private void createObfuscatedWar(File extractDirectory, File obfuscatedWar)
+	private void createObfuscatedWar(File obfuscatedWar, File unobfuscatedWar, File obfuscatedJar)
 	{
 		try
 		{
 			warArchiver.setIgnoreWebxml(false);
 			warArchiver.setDestFile(obfuscatedWar);
-			warArchiver.addDirectory(extractDirectory);
-//			use this!
-//			warArchiver.addArchivedFileSet();
+
+			warArchiver.addArchivedFileSet(obfuscatedJar, "WEB-INF/classes/");
+			warArchiver.addArchivedFileSet(unobfuscatedWar, new String[] { "**/*" }, new String [] { "WEB-INF/classes/**" });
+
 			warArchiver.createArchive();
 		} catch (ArchiverException e)
 		{
@@ -114,59 +117,6 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 		} catch (IOException e)
 		{
 			throw new ObfuscationException("Failed to create obfuscated war file.", e);
-		}
-	}
-
-	private void addObfuscatedClassesToStaging(File obfuscatedJarFile, File classesDir)
-	{
-		try
-		{
-			jarUnArchiver.setSourceFile(obfuscatedJarFile);
-			jarUnArchiver.setDestFile(classesDir);
-			jarUnArchiver.extract();
-		} catch (ArchiverException e)
-		{
-			throw new ObfuscationException("Failed to extract obfuscated jar.", e);
-		}
-	}
-
-	private void initStagingDirectory(File unobfuscatedWar, File extractDirectory, File classesDir)
-	{
-		// create staging directory by unzipping the unobfuscated war
-		extractDirectory.mkdirs();
-		try
-		{
-			warUnArchiver.setSourceFile(unobfuscatedWar);
-			warUnArchiver.setDestFile(extractDirectory);
-			warUnArchiver.setFileSelectors(new FileSelector[]{
-					new FileSelector()
-					{
-						/**
-						 * Exclude classes directory and unobfuscated jars.
-						 */
-						@Override
-						public boolean isSelected(FileInfo fileInfo) throws IOException
-						{
-							if ("WEB-INF/classes".equals(fileInfo.getName()))
-							{
-								return false;
-							}
-							return true;
-						}
-					}
-			});
-			warUnArchiver.extract();
-		} catch (ArchiverException e)
-		{
-			throw new ObfuscationException("Failed to extract unobfuscated war.", e);
-		}
-		try
-		{
-			FileUtils.deleteDirectory(classesDir);
-			classesDir.mkdirs();
-		} catch (IOException e)
-		{
-			throw new ObfuscationException("Could not delete unobfuscated classes directory.", e);
 		}
 	}
 
