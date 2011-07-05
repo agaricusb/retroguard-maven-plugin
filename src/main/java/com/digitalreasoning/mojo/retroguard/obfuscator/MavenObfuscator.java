@@ -52,8 +52,8 @@ public class MavenObfuscator extends Obfuscator {
 					        return artifact.isResolved() && !MavenObfuscator.this.getDependentJars().contains(artifact.getFile());
 				        }
 			        }));
-	        Collection<Artifact> dependentSpecs = new ArrayList<Artifact>();
-	        Collection<Artifact> dependentJars = new ArrayList<Artifact>();
+	        Collection<RetroguardSpecFile> dependentSpecs = new ArrayList<RetroguardSpecFile>();
+	        Collection<File> dependentJars = new ArrayList<File>();
             for(Artifact artifact: project.getArtifacts())
             {
 	            if(classpathFilter.include(artifact))
@@ -62,8 +62,9 @@ public class MavenObfuscator extends Obfuscator {
                 }
 	            if(specFilter.include(artifact))
 	            {
-		            dependentSpecs.add(artifact);
-		            project.getArtifactMap();
+		            final RetroguardSpecFile specFile = new RetroguardSpecFile(artifact.getFile());
+		            dependentSpecs.add(specFile);
+		             specFile.getUnobfuscatedId()
 	            }
             }
             for(URL constituent: pluginRealm.getURLs())

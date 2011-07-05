@@ -27,7 +27,7 @@ public abstract class Obfuscator {
     private File workDir;
 
     private Collection<File> dependentJars = new HashSet<File>();
-    private Collection<File> dependentSpecs = new HashSet<File>();
+    private Collection<RetroguardSpecFile> dependentSpecs = new HashSet<RetroguardSpecFile>();
 
     protected Obfuscator(File inJar, File outJar, File obfuscateLog, File config, File workDir) throws ObfuscationException
     {
@@ -58,7 +58,7 @@ public abstract class Obfuscator {
 		return dependentJars;
 	}
 
-	public void setDependentSpecs(Collection<File> dependentSpecs) {
+	public void setDependentSpecs(Collection<RetroguardSpecFile> dependentSpecs) {
         this.dependentSpecs = dependentSpecs;
     }
 
@@ -158,7 +158,7 @@ public abstract class Obfuscator {
         {
             regenerate = false;
             long specModified = combinedSpec.lastModified();
-            for(File dependentSpec: dependentSpecs)
+            for(RetroguardSpecFile dependentSpec: dependentSpecs)
             {
                 if(dependentSpec.lastModified() > specModified)
                 {
@@ -179,24 +179,13 @@ public abstract class Obfuscator {
             } catch (IOException e) {
                 throw new ObfuscationException("Could not create output directory...", e);
             }
-            FileWriter writer = null;
-            try {
-                writer = new FileWriter(combinedSpec);
-                Files.copy(config, Charset.forName("UTF-8"), writer);
-                for (File dependentSpec : dependentSpecs) {
-                    Files.copy(dependentSpec, Charset.forName("UTF-8"), writer);
-                }
-            } catch (FileNotFoundException e) {
-                throw new ObfuscationException("Failed to write spec file " + combinedSpec, e);
-            } catch (IOException e) {
-                throw new ObfuscationException("Failed to write spec file " + combinedSpec, e);
-            } finally {
-                try {
-                    Closeables.close(writer, false);
-                } catch (IOException e) {
-                    throw new ObfuscationException("Closing spec file failed...", e);
-                }
-            }
+	        for(RetroguardSpecFile specFile: dependentSpecs) {
+		        try {
+			        specFile.appendRawSpec(combinedSpec);
+		        } catch (IOException e) {
+			        throw new ObfuscationException("Could not generate combined spec file.");
+		        }
+	        }
         }
         return combinedSpec;
     }

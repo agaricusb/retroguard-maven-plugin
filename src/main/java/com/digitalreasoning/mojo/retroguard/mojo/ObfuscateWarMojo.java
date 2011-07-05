@@ -2,6 +2,7 @@ package com.digitalreasoning.mojo.retroguard.mojo;
 
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
+import com.google.common.base.Strings;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.war.WarArchiver;
@@ -107,7 +108,7 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 			warArchiver.setIgnoreWebxml(false);
 			warArchiver.setDestFile(obfuscatedWar);
 
-			warArchiver.addArchivedFileSet(obfuscatedJar, "WEB-INF/classes/");
+			warArchiver.addArchivedFileSet(obfuscatedJar, "WEB-INF/classes/", new String[] { "**/*" }, new String[] { "META-INF/MANIFEST.MF" });
 			warArchiver.addArchivedFileSet(unobfuscatedWar, new String[] { "**/*" }, new String [] { "WEB-INF/classes/**" });
 
 			warArchiver.createArchive();
@@ -130,5 +131,15 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	protected File getInputJar()
 	{
 		return unobfuscatedJar == null ? Utils.getArtifactFile(outputDirectory, finalName, unobfuscatedClassifier, "jar") : unobfuscatedJar;
+	}
+
+	@Override
+	protected String getObfuscatedId() {
+		return project.getId() + (Strings.isNullOrEmpty(classifier) ? "" : ":" + classifier);
+	}
+
+	@Override
+	protected String getUnobfuscatedId() {
+		return project.getId() + ":" + unobfuscatedClassifier;
 	}
 }

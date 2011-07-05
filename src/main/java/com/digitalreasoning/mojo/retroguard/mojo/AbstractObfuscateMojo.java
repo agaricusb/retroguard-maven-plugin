@@ -3,6 +3,7 @@ package com.digitalreasoning.mojo.retroguard.mojo;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.MavenObfuscator;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
+import com.digitalreasoning.mojo.retroguard.obfuscator.RetroguardSpecFile;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -11,6 +12,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @requiresDependencyResolution compile
@@ -66,9 +68,10 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 	    File jarFile = getInputJar();
 	    File obfuscatedJarFile = getOutputJar();
 	    File obfuscationLogFile = Utils.getArtifactFile(outputDirectory, getFinalName(), classifier, Utils.SPEC_EXTENSION);
+		File obfuscatorOutput = new File(outputDirectory, "obfuscatorOutput.log");
 
 	    try {
-	        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscationLogFile, config, new File(this.outputDirectory, "obfuscation"), getLog(), project);
+	        MavenObfuscator obfuscator = new MavenObfuscator(jarFile, obfuscatedJarFile, obfuscatorOutput, config, new File(this.outputDirectory, "obfuscation"), getLog(), project);
 	        obfuscator.obfuscate();
 	    } catch (ObfuscationException e) {
 	        throw new MojoFailureException("Could not successfully obfuscate.", e);
@@ -76,10 +79,21 @@ public abstract class AbstractObfuscateMojo extends AbstractMojo
 
 		postProcessObfuscated(obfuscatedJarFile);
 
+		RetroguardSpecFile specFile = new RetroguardSpecFile(getObfuscatedId(), getUnobfuscatedId(), obfuscationLogFile);
+		try {
+			specFile.writeSpec(obfuscatorOutput);
+		} catch (IOException e) {
+			throw new MojoExecutionException("Could not write retroguard spec file.", e);
+		}
+
 		projectHelper.attachArtifact( project, Utils.SPEC_TYPE, classifier, obfuscationLogFile);
 
 		getLog().info("Obfuscation Complete: " + (System.currentTimeMillis() - start)/1000.0 + "s");
 	}
+
+	protected abstract String getObfuscatedId();
+
+	protected abstract String getUnobfuscatedId();
 
 	public abstract String getFinalName();
 

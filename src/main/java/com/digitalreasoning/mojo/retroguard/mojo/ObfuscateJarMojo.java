@@ -3,6 +3,7 @@ package com.digitalreasoning.mojo.retroguard.mojo;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.MavenObfuscator;
+import com.google.common.base.Strings;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -84,4 +85,15 @@ public class ObfuscateJarMojo extends AbstractObfuscateMojo
 	{
 		return unobfuscatedJar == null ? Utils.getArtifactFile(outputDirectory, finalName, unobfuscatedClassifier, "jar") : unobfuscatedJar;
 	}
+
+	@Override
+	protected String getObfuscatedId() {
+		return project.getId() + (Strings.isNullOrEmpty(classifier) ? "" : ":" + classifier);
+	}
+
+	@Override
+	protected String getUnobfuscatedId() {
+		return project.getId() + ":" + unobfuscatedClassifier;
+	}
+
 }
