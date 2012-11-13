@@ -35,8 +35,8 @@
             <version>1.2</version>
         </dependency>
         <dependency>
-            <groupId>com.retrologic</groupId>
-            <artifactId>retroguard</artifactId>
+            <groupId>com.retrologic.retroguard</groupId>
+            <artifactId>retroguard-gpl</artifactId>
             <version>2.3.1</version>
         </dependency>
         <dependency>
