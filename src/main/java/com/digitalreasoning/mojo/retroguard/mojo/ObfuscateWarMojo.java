@@ -1,17 +1,14 @@
 package com.digitalreasoning.mojo.retroguard.mojo;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.war.WarArchiver;
+
 import com.digitalreasoning.mojo.retroguard.Utils;
 import com.digitalreasoning.mojo.retroguard.obfuscator.ObfuscationException;
 import com.google.common.base.Strings;
-import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.war.WarArchiver;
-import org.codehaus.plexus.components.io.fileselectors.FileInfo;
-import org.codehaus.plexus.components.io.fileselectors.FileSelector;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Goal which obfuscates a war file.
@@ -31,24 +28,12 @@ public class ObfuscateWarMojo extends AbstractObfuscateMojo
 	 */
 	private String finalName;
 
-	private String outputFileNameMapping = "@{artifactId}@-@{version}@@{dashClassifier?}@.@{extension}@";
-
 	/**
 	 * The WAR archiver.
 	 *
 	 * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="war"
 	 */
 	private WarArchiver warArchiver;
-
-	/**
-	 * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="war"
-	 */
-	private UnArchiver warUnArchiver;
-
-	/**
-	 * @component role="org.codehaus.plexus.archiver.UnArchiver" roleHint="jar"
-	 */
-	private UnArchiver jarUnArchiver;
 
 	/**
 	 * Jar that we wish to obfuscate.

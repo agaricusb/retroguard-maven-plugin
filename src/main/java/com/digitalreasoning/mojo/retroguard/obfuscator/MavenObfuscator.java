@@ -23,24 +23,19 @@ public class MavenObfuscator {
 
     private Log log;
     private MavenProject project;
-	private Class<RetroGuardImpl> retroGuardClass;
+	private Class<?> retroGuardClass;
 
 	private File inJar;
     private File outJar;
     private File obfuscateLog;
     private File config;
-    private File workDir;
-	
+    
     public MavenObfuscator (File inJar, File outJar, File obfuscateLog, File config, File workDir, Log log, MavenProject project)
     throws ObfuscationException {
         this.inJar = inJar;
         this.outJar = outJar;
         this.obfuscateLog = obfuscateLog;
         this.config = config;
-        this.workDir = workDir;
-
-        if (workDir.exists() && !workDir.isDirectory())
-        	throw new ObfuscationException("workDir must be a directory");
 
         this.log = log;
         this.project = project;
